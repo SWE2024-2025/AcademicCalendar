@@ -1,0 +1,85 @@
+﻿@using DevExpress.Blazor
+@using DevExpress.Blazor.Localization;
+@using DevExpress.Utils.Localization;
+@using AcademicYearCalendar.Data
+@using System.Collections.Concurrent
+
+@page "/"
+@rendermode InteractiveServer
+
+
+<PageTitle>التقويم</PageTitle>
+<FluentButton Appearance="Appearance.Accent" OnClick="SaveOnClick">Save</FluentButton>
+
+<DxScheduler @bind-StartDate="@StartDate"
+DataStorage="@DataStorage"
+GroupType="SchedulerGroupType.None"
+VisibleResourcesDataSource="VisibleResources"
+             FirstDayOfWeek="DayOfWeek.Saturday"
+             WorkDays="SchedulerWeekDays.Saturday | SchedulerWeekDays.Sunday | SchedulerWeekDays.Monday | SchedulerWeekDays.Tuesday | SchedulerWeekDays.Wednesday| SchedulerWeekDays.Thursday | SchedulerWeekDays.Friday"
+CssClass="demo-sc-size">
+    <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="false" VisibleTime="timeRabge" > </DxSchedulerDayView>
+    <DxSchedulerWeekView ShowWorkTimeOnly="false" VisibleTime="timeRabge"></DxSchedulerWeekView>
+    <DxSchedulerMonthView ShowWorkDaysOnly="false" MonthCount="1"></DxSchedulerMonthView>
+</DxScheduler>
+
+@code {
+    DateTime StartDate { get; set; } = DateTime.Today;
+    DxSchedulerDataStorage DataStorage = new DxSchedulerDataStorage()
+        {
+            AppointmentsSource = ResourceAppointmentCollection.GetAppointments(),
+            AppointmentMappings = new DxSchedulerAppointmentMappings()
+            {
+                Type = "AppointmentType",
+                Start = "StartDate",
+                End = "EndDate",
+                Subject = "Caption",
+                AllDay = "AllDay",
+                Location = "Location",
+                Description = "Description",
+                LabelId = "Label",
+                StatusId = "Status",
+                RecurrenceInfo = "Recurrence",
+                ResourceId = "Resources",                 
+            },
+            ResourcesSource = ResourceCollection.GetResourcesForGrouping(),
+            ResourceMappings = new DxSchedulerResourceMappings()
+            {
+                Id = "Id",
+                Caption = "Name",
+                BackgroundCssClass = "BackgroundCss",
+                TextCssClass = "TextCss"
+            },
+            EnableMultipleResources = true
+        };
+    List<Resource> VisibleResources = ResourceCollection.GetResources().ToList();
+    DxSchedulerTimeSpanRange timeRabge = new DxSchedulerTimeSpanRange(new TimeSpan(7,0,0), new TimeSpan(23,0,0));
+    static ConcurrentBag<string> stringID = new ConcurrentBag<string>();
+
+    public void SaveOnClick()
+    {
+        foreach (string str in stringID)
+        {
+            
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        XtraLocalizer.HandleAllThreadEvents();
+        XtraLocalizer.QueryLocalizedString +=
+        new EventHandler<XtraLocalizer.QueryLocalizedStringEventArgs>(XtraLocalizer_QueryLocalizedString);
+    }
+    static private void XtraLocalizer_QueryLocalizedString(object sender, XtraLocalizer.QueryLocalizedStringEventArgs e)
+    {
+        if (e.StringIDType == typeof(DxBlazorStringId))
+        {
+            stringID.Add(((DxBlazorStringId)e.StringID).ToString());
+
+            if ((DxBlazorStringId)e.StringID == DxBlazorStringId.A11y_Grid_SearchBox)
+                e.Value = "Enter text to search grid data. Use space to separate several search strings";
+            if ((DxBlazorStringId)e.StringID == DxBlazorStringId.Grid_SearchBoxNullText)
+                e.Value = "Search...";
+        }
+    }
+}

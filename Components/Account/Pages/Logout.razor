@@ -1,0 +1,35 @@
+﻿@* @layout Layout.EmptyLayout *@
+@page "/Account/logout2"
+@rendermode InteractiveServer
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Identity
+@using AcademicYearCalendar.Data
+@inject IdentityRedirectManager RedirectManager
+
+@inject SignInManager<ApplicationUser> signInManager
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        
+        //await signInManager.SignOutAsync();        
+        //TypedResults.LocalRedirect($"/");
+        //Navigation.NavigateTo("Account/Login", forceLoad: true);
+        //RedirectManager.RedirectTo("Account/Login");
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        JS.InvokeVoidAsync("submitLogoutForm");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {        
+        //RedirectManager.RedirectTo("Account/Logout");
+    }
+}

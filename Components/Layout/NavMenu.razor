@@ -1,0 +1,80 @@
+﻿@rendermode InteractiveServer
+
+@implements IDisposable
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime JS
+
+<div class="navmenu">
+    <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon" />
+    <label for="navmenu-toggle" class="navmenu-icon"><FluentIcon Value="@(new Icons.Regular.Size20.Navigation())" Color="Color.Fill" /></label>
+    <nav class="sitenav" aria-labelledby="main-menu">
+        <FluentNavMenu Id="main-menu" Collapsible="true" Width="250" Title="Navigation menu" @bind-Expanded="expanded" CustomToggle="true">
+            <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Calendar())" IconColor="Color.Accent">التقويم</FluentNavLink>            
+            <AuthorizeView>
+                <Authorized>
+                    <FluentNavGroup Title="الاعدادات" Icon="@(new Icons.Regular.Size20.AppsSettings())" IconColor="Color.Accent">
+
+                        @* <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.HomePerson())" IconColor="Color.Accent">@context.User.Identity?.Name</FluentNavLink> *@
+                        <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.HomePerson())" IconColor="Color.Accent">الحساب</FluentNavLink>
+                        <FluentNavLink Href="/Settings/AcademicPrograms" Icon="@(new Icons.Regular.Size20.HomePerson())" IconColor="Color.Accent">البرامج الدراسة</FluentNavLink>
+                        <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.ScreenshotRecord())" IconColor="Color.Accent">المواد الدراسية</FluentNavLink>
+                        <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.ChartPerson())" IconColor="Color.Accent">هيئة اعضاء التدريس</FluentNavLink>
+                        <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.LayerDiagonalPerson())" IconColor="Color.Accent">إدارة المستخدمين</FluentNavLink>
+                    </FluentNavGroup>
+                    <FluentNavLink Icon="@(new Icons.Regular.Size20.SignOut())" IconColor="Color.Accent" OnClick="OnLogoutClick">خروج</FluentNavLink>
+                    <form action="Account/Logout" method="post" id="logoutForm">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                    </form>
+                </Authorized>
+                <NotAuthorized>
+                    <FluentNavLink Href="Account/Login" Icon="@(new Icons.Regular.Size20.LockClosedKey())" IconColor="Color.Accent">تسجيل دخول</FluentNavLink>
+                </NotAuthorized>
+            </AuthorizeView>
+            
+            
+                
+                    
+                    
+                
+                
+            
+        </FluentNavMenu>
+    </nav>
+</div>
+
+@code {
+    private bool expanded = true;
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+        AuthStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    private void OnLogoutClick()
+    {
+        JS.InvokeVoidAsync("submitLogoutForm");
+    }
+
+    private void OnAuthenticationStateChanged(object? sender)
+    {
+        
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
+

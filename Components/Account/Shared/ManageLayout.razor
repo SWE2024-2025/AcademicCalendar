@@ -1,0 +1,18 @@
+﻿@inherits LayoutComponentBase
+@layout AcademicYearCalendar.Components.Layout.MainLayout
+
+<h1>إدارة حسابك</h1>
+
+<div>    
+    <h2>تعديل اعدادات الحساب</h2>
+    <hr />
+    <FluentGrid>
+        <FluentGridItem sm="3">
+            <ManageNavMenu />
+        </FluentGridItem>
+
+        <FluentGridItem sm="9">
+            @Body
+        </FluentGridItem>
+    </FluentGrid>
+</div>

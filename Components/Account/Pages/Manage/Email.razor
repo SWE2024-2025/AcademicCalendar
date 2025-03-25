@@ -1,0 +1,78 @@
+﻿@page "/Account/Manage/Email"
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+@using AcademicYearCalendar.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IEmailSender<ApplicationUser> EmailSender
+@inject IdentityUserAccessor UserAccessor
+@inject NavigationManager NavigationManager
+
+<PageTitle>تعديل البريد الالكتروني</PageTitle>
+
+<h3>تعديل البريد الالكتروني</h3>
+
+<StatusMessage Message="@message"/>
+<FluentGrid>
+    <FluentGridItem xs="12" sm="6">        
+        <EditForm Model="Input" FormName="change-email" OnValidSubmit="OnValidSubmitAsync" method="post">
+            <DataAnnotationsValidator />
+            <FluentValidationSummary class="text-danger" role="alert" />
+            <FluentTextField Name="Input.NewEmail" @bind-Value="Input.NewEmail" AutoComplete="email" Required="true" Placeholder="ادخل البريد الالكتروني" Label="البريد الالكتروني" Style="width: 100%" />
+            <FluentValidationMessage For="() => Input.NewEmail" class="text-danger" />
+            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" Style="width: 100%;">حفظ</FluentButton>
+        </EditForm>
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+    private string? message;
+    private ApplicationUser user = default!;
+    private string? email;
+    private bool isEmailConfirmed;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm(FormName = "change-email")]
+    private InputModel Input { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        email = await UserManager.GetEmailAsync(user);
+        isEmailConfirmed = await UserManager.IsEmailConfirmedAsync(user);
+
+        Input.NewEmail ??= email;
+    }
+
+    private async Task OnValidSubmitAsync()
+    {
+        if (Input.NewEmail is null || Input.NewEmail == email)
+        {
+            message = "لم يتم تغيير البريد الالكتروني";
+            return;
+        }
+
+        var result = await UserManager.SetEmailAsync(user, Input.NewEmail);
+        user.EmailConfirmed = true;
+        var updateResult = await UserManager.UpdateAsync(user);
+                
+        
+        message = "تم تحديث البريد الالكتروني";
+    }
+
+   
+
+    private sealed class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        [Display(Name = "New email")]
+        public string? NewEmail { get; set; }
+    }
+}
