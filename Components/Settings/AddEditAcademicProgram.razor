@@ -2,21 +2,29 @@
 @using AcademicYearCalendar.Data
 @inject AppDbContext AppDbContext
 @rendermode InteractiveServer
-
+@inject IMessageService MessageService
 
 <h3>اضافة/تعديل برنامج دراسي</h3>
 
 
+
 <FluentGrid>
     <FluentGridItem xs="12" sm="6">
-        <EditForm Model="program" FormName="change-email" OnValidSubmit="OnValidSubmitAsync" method="post">
+        <EditForm Model="program" FormName="change-academicProgram" OnValidSubmit="OnValidSubmitAsync" method="post" novalidate>
             <DataAnnotationsValidator />
             <FluentValidationSummary class="text-danger" role="alert" />
-            <FluentTextField Name="Input.NewEmail" @bind-Value="program.ProgramName" Required="true" Placeholder="ادخل البريد الالكتروني" Label="اسم البرنامج الدراسي" Style="width: 100%" />
+            <FluentTextField Name="program.ProgramName" @bind-Value="program.ProgramName" Required="true" Placeholder="ادخل اسم البرنامج الدراسي" Label="اسم البرنامج الدراسي" Style="width: 100%" />
             <FluentValidationMessage For="() => program.ProgramName" class="text-danger" />
-            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Save())" Style="width: 50%;">حفظ</FluentButton>
-            <FluentButton Type="ButtonType.Button" @onclick="ExitOnClick" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.RecordStop())" Style="width: 50%;">رجوع</FluentButton>
+            <div style="display:flex">
+                <FluentSpacer />
+                <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Save())" Style="width: 25%;">حفظ</FluentButton>
+                <FluentSpacer />
+                <FluentButton Type="ButtonType.Button" @onclick="ExitOnClick" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.RecordStop())" Style="width: 25%;">رجوع</FluentButton>
+                <FluentSpacer />
+            </div>
         </EditForm>
+        
+
     </FluentGridItem>
 </FluentGrid>
 
@@ -26,6 +34,8 @@
     public AcademicProgram AcademicProgram { get; set; }
 
     private AcademicProgram program { get; set; }
+
+    
 
     [Parameter]
     public string Status { get; set; }
@@ -45,6 +55,15 @@
 
     async Task ExitOnClick()
     {
+        //AppDbContext.Entry(AcademicProgram).Reload();
+        MessageService.ShowMessageBar(options =>
+        {
+            options.Intent = MessageIntent.Warning;
+            options.Body = "لم يتم تعديل اي بيانات";
+            options.Timeout = 3000;
+            options.Section = "MESSAGES_TOP";
+        });
+        AppDbContext.ChangeTracker.Clear();
         await OnDone.InvokeAsync();
     }
 
@@ -55,6 +74,7 @@
         //     message = "لم يتم تغيير البريد الالكتروني";
         //     return;
         // }
+
         if (Status == "Add")
         {
             program.Id = AppDbContext.GetNextResourceId();
@@ -68,12 +88,16 @@
         await AppDbContext.SaveChangesAsync();
         await OnDone.InvokeAsync();
 
-
+        //await MessageService.ShowMessageBarAsync("تم حفظ البيانات بنجاح", MessageIntent.Success, "MESSAGES_TOP");
+        MessageService.ShowMessageBar(options =>
+        {
+            options.Intent = MessageIntent.Success;
+            options.Body = "تم حفظ البيانات بنجاح";
+            options.Timeout = 3000;
+            options.Section = "MESSAGES_TOP";
+        });
         //message = "تم تحديث البريد الالكتروني";
     }
 
-    public class ResourceIdSequenceValue
-    {
-        public long Value { get; set; }
-    }
+    
 }

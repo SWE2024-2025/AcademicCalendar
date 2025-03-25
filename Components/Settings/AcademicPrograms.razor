@@ -5,13 +5,20 @@
 @rendermode InteractiveServer
 
 <h1>إدارة البرامج الدراسية</h1>
-
 <hr />
-<div style="height:50px"></div>
+<div style="height:50px">
+    <FluentMessageBarProvider Section="MESSAGES_TOP" />
+</div>
 @if (Status == "Add" || Status == "Edit")
 {
     <AddEditAcademicProgram AcademicProgram="@selectedAcademicProgram" Status="@Status" OnDone="OnDone"></AddEditAcademicProgram>
 }
+
+@if (Status == "EditSubjects")
+{
+    <EditAcademicProgramSubjects AcademicProgram="@selectedAcademicProgram" Status="@Status" OnDone="OnDone"></EditAcademicProgramSubjects>
+}
+
 
 @if (Status == "List")
 {
@@ -27,7 +34,8 @@
             }
         </TemplateColumn>
         <TemplateColumn Title="">
-            <FluentButton Appearance="Appearance.Accent" @onclick="()=> EditOnClick(context)" IconStart="@(new Icons.Regular.Size16.Add())">تعديل برنامج دراسي</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" @onclick="()=> EditOnClick(context)" IconStart="@(new Icons.Regular.Size16.Edit())">تعديل برنامج دراسي</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" @onclick="()=> EditSubjectsOnClick(context)" IconStart="@(new Icons.Regular.Size16.Edit())">تعديل المواد الدراسية</FluentButton>
         </TemplateColumn>
     </FluentDataGrid>
     <FluentPaginator State="@pagination" />
@@ -59,6 +67,12 @@
     {
         selectedAcademicProgram = program;
         Status = "Edit";
+    }
+
+    void EditSubjectsOnClick(AcademicProgram program)
+    {
+        selectedAcademicProgram = program;
+        Status = "EditSubjects";
     }
 
     void OnDone()

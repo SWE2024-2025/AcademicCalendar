@@ -6,8 +6,14 @@ namespace AcademicYearCalendar.Data
 {
     public class AppDbContext : DbContext
     {
+        public DbSet<AcademicProgram> AcademicProgram { get; set; }
+        public DbSet<StudySubject> StudySubject { get; set; }
+        public DbSet<Staff> Staff { get; set; }
+        public DbSet<ResourceIdSequenceValue> SequenceValue { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
         {
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -38,12 +44,13 @@ namespace AcademicYearCalendar.Data
             var nextId = result.First().Value;
             return (int)nextId;
         }
-
-        public DbSet<AcademicProgram> AcademicProgram { get; set; }
-        public DbSet<StudySubject> StudySubject { get; set; }
-        public DbSet<Staff> Staff { get; set; }
-        public DbSet<ResourceIdSequenceValue> SequenceValue { get; set; }
+       
     }
 
-   
+    public class ResourceIdSequenceValue
+    {
+        public long Value { get; set; }
+    }
+
+
 }

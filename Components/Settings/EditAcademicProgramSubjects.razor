@@ -1,0 +1,120 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using AcademicYearCalendar.Data
+@inject AppDbContext AppDbContext
+@rendermode InteractiveServer
+@inject IMessageService MessageService
+<h3>تعديل المواد الدراسية</h3>
+
+<FluentGrid Spacing="1" AdaptiveRendering="true" Justify="JustifyContent.FlexStart" Style="padding: 4px;">
+
+    <FluentGridItem xs="12" sm="6" HiddenWhen="GridItemHidden.SmAndDown">
+        <FluentCombobox Placeholder="" Label="المواد الدراسية" Autofocus="true" @bind-SelectedOption=@selectedSubject Items="@studySubject" OptionText="@(i => i.SubjectName)" OptionValue="@(i => i.Id.ToString())" Width="80%" Height="200px" Immediate ImmediateDelay="100" />
+        <FluentButton Type="ButtonType.Button" @onclick="AddOnClick" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Add())">اضافة</FluentButton>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6" HiddenWhen="GridItemHidden.SmAndDown">
+
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="9" HiddenWhen="GridItemHidden.SmAndDown">
+        <FluentDataGrid Items="@AcademicProgram.StudySubjects.AsQueryable()" MultiLine="true">
+            <PropertyColumn Property="@(p => p.SubjectName)" Title="اسم المادة" />
+            <TemplateColumn Title="">
+                <FluentButton Appearance="Appearance.Accent" @onclick="()=> DeleteOnClick(context)" IconStart="@(new Icons.Regular.Size16.Delete())">الغاء المادة</FluentButton>
+            </TemplateColumn>
+        </FluentDataGrid>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="3" HiddenWhen="GridItemHidden.SmAndDown">
+
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <div style="display:flex">
+            <FluentSpacer />
+            <FluentButton Type="ButtonType.Button" @onclick="SaveOnClick" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Save())" Style="width: 25%;">حفظ</FluentButton>
+            <FluentSpacer />
+            <FluentButton Type="ButtonType.Button" @onclick="ExitOnClick" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.RecordStop())" Style="width: 25%;">رجوع</FluentButton>
+            <FluentSpacer />
+        </div>
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+    [Parameter]
+    public AcademicProgram AcademicProgram { get; set; }
+
+    [Parameter]
+    public string Status { get; set; }
+
+    [Parameter]
+    public EventCallback OnDone { get; set; }
+
+
+    private AcademicProgram crAcademicProgram { get; set; }
+    private IQueryable<StudySubject> studySubject;
+    private StudySubject selectedSubject;
+
+
+    protected override void OnInitialized()
+    {
+        loadStudySubject();
+    }
+
+    private void loadStudySubject()
+    {
+        studySubject = AppDbContext.StudySubject;
+    }
+
+
+    void DeleteOnClick(StudySubject subject)
+    {
+        AcademicProgram.StudySubjects.Remove(subject);
+    }
+
+    void AddOnClick()
+    {
+        if (AcademicProgram.StudySubjects == null)
+        {
+            AcademicProgram.StudySubjects = new List<StudySubject>();
+        }
+        if (selectedSubject == null)
+        {
+            MessageService.ShowMessageBar(options =>
+               {
+                   options.Intent = MessageIntent.Error;
+                   options.Body = "يجب اختيار المادة";
+                   options.Timeout = 3000;
+                   options.Section = "MESSAGES_TOP";
+               });
+            return;
+        }
+        AcademicProgram.StudySubjects.Add(selectedSubject);
+    }
+
+    async Task SaveOnClick()
+    {
+        AppDbContext.AcademicProgram.Update(AcademicProgram);
+        AppDbContext.SaveChanges();
+        MessageService.ShowMessageBar(options =>
+        {
+            options.Intent = MessageIntent.Success;
+            options.Body = "تم حفظ البيانات بنجاح";
+            options.Timeout = 3000;
+            options.Section = "MESSAGES_TOP";
+        });
+        await OnDone.InvokeAsync();
+    }
+
+    async Task ExitOnClick()
+    {
+        
+        MessageService.ShowMessageBar(options =>
+        {
+            options.Intent = MessageIntent.Warning;
+            options.Body = "لم يتم تعديل اي بيانات";
+            options.Timeout = 3000;
+            options.Section = "MESSAGES_TOP";
+        });
+
+        //AppDbContext.Entry(AcademicProgram).Reload();
+        AppDbContext.ChangeTracker.Clear();
+        await OnDone.InvokeAsync();
+    }
+}

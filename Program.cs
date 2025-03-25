@@ -56,8 +56,13 @@ builder.Services.AddAuthentication(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<AppIdentityDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+{
+    options.UseSqlServer(connectionString);
+}
+);
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
