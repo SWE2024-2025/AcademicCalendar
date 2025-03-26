@@ -18,7 +18,7 @@
     <FluentButton Appearance="Appearance.Accent" @onclick="AddOnClick" IconStart="@(new Icons.Regular.Size16.Add())">اضافة مادة دراسية</FluentButton>
     <FluentDataGrid Items="@subjects" MultiLine="true" Pagination="@pagination">
         <PropertyColumn Property="@(p => p.SubjectName)" Title="اسم المادة الدراسية" />
-        <TemplateColumn Title="المواد البرامج الدراسية">
+        <TemplateColumn Title="البرامج الدراسية">
             @foreach (var subject in context.AcademicPrograms)
             {
                 <div>

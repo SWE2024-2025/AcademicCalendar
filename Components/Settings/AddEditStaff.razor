@@ -4,17 +4,17 @@
 @rendermode InteractiveServer
 @inject IMessageService MessageService
 
-<h3>اضافة/تعديل مادة دراسية</h3>
+<h3>اضافة/تعديل بيانات عضو هيئة التدريس</h3>
 
 
 
 <FluentGrid>
     <FluentGridItem xs="12" sm="6">
-        <EditForm Model="StudySubject" FormName="change-StudySubject" OnValidSubmit="OnValidSubmitAsync" method="post" novalidate>
+        <EditForm Model="Staff" FormName="change-StudySubject" OnValidSubmit="OnValidSubmitAsync" method="post" novalidate>
             <DataAnnotationsValidator />
             <FluentValidationSummary class="text-danger" role="alert" />
-            <FluentTextField Name="program.ProgramName" @bind-Value="StudySubject.SubjectName" Required="true" Placeholder="ادخل اسم المادة الدراسية" Label="اسم المادة الدراسية" Style="width: 100%" />
-            <FluentValidationMessage For="() => StudySubject.SubjectName" class="text-danger" />
+            <FluentTextField Name="program.ProgramName" @bind-Value="Staff.StaffName" Required="true" Placeholder="ادخل اسم عضو هيئة التدريس" Label="اسم عضو هيئة التدريس" Style="width: 100%" />
+            <FluentValidationMessage For="() => Staff.StaffName" class="text-danger" />
             <div style="display:flex">
                 <FluentSpacer />
                 <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Save())" Style="width: 25%;">حفظ</FluentButton>
@@ -31,7 +31,7 @@
 
 @code {
     [Parameter]
-    public StudySubject StudySubject { get; set; }
+    public Staff Staff { get; set; }
 
 
     [Parameter]
@@ -44,7 +44,7 @@
     {
         if (Status == "Add")
         {
-            StudySubject = new StudySubject();
+            Staff = new Staff();
         }
     }
 
@@ -67,14 +67,14 @@
 
         if (Status == "Add")
         {
-            StudySubject.Id = AppDbContext.GetNextResourceId();
-            AppDbContext.StudySubject.Add(StudySubject);
+            Staff.Id = AppDbContext.GetNextResourceId();
+            AppDbContext.Staff.Add(Staff);
         }
         if (Status == "Edit")
         {
-            AppDbContext.StudySubject.Update(StudySubject);
+            AppDbContext.Staff.Update(Staff);
         }
-        
+
         AppDbContext.SaveChanges();
 
         await MessageService.ShowMessageBarAsync(options =>
