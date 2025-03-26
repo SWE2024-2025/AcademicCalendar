@@ -8,6 +8,19 @@
 @page "/"
 @rendermode InteractiveServer
 
+<style>
+    .dxbl-scroll-viewer > .dxbl-scroll-viewer-vert-scroll-bar > .dxbl-scroll-viewer-scroll-thumb {
+        display: none !important
+    }
+
+    .dxbl-scroll-viewer > .dxbl-scroll-viewer-hor-scroll-bar:not(.dxbl-disabled):not(:disabled).dxbl-active, .dxbl-scroll-viewer > .dxbl-scroll-viewer-vert-scroll-bar:not(.dxbl-disabled):not(:disabled).dxbl-active {
+        display: none !important
+    }
+
+    .dxbl-scroll-viewer-vert-scroll-bar dxbl-active {
+        display: none !important
+    }
+</style>
 
 <PageTitle>التقويم</PageTitle>
 @* <FluentButton Appearance="Appearance.Accent" OnClick="SaveOnClick" IconStart="@(new MyIcons.Regular.Size20.Certificate())">Save</FluentButton> *@
@@ -18,10 +31,19 @@ GroupType="SchedulerGroupType.None"
 VisibleResourcesDataSource="VisibleResources"
 FirstDayOfWeek="DayOfWeek.Saturday"
 WorkDays="SchedulerWeekDays.Saturday | SchedulerWeekDays.Sunday | SchedulerWeekDays.Monday | SchedulerWeekDays.Tuesday | SchedulerWeekDays.Wednesday| SchedulerWeekDays.Thursday | SchedulerWeekDays.Friday"
+             AllowCreateAppointment="false"
+             AllowDeleteAppointment="false"
+             AllowEditAppointment="false"
+             AllowDragAppointment="false"
+             AllowResizeAppointment="false"
+             AllowDragAppointmentBetweenResources="false"
+             ShowAppointmentTooltip="true"
 CssClass="demo-sc-size">
-    <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="false" VisibleTime="timeRabge" > </DxSchedulerDayView>
-    <DxSchedulerWeekView ShowWorkTimeOnly="false" VisibleTime="timeRabge"></DxSchedulerWeekView>
-    <DxSchedulerMonthView ShowWorkDaysOnly="false" MonthCount="1"></DxSchedulerMonthView>
+    <Views>
+            <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="false" VisibleTime="timeRabge"> </DxSchedulerDayView>
+            <DxSchedulerWeekView ShowWorkTimeOnly="false" VisibleTime="timeRabge"></DxSchedulerWeekView>
+            <DxSchedulerMonthView ShowWorkDaysOnly="false" MonthCount="1"></DxSchedulerMonthView>
+    </Views>    
 </DxScheduler>
 
 @code {
@@ -42,7 +64,12 @@ CssClass="demo-sc-size">
                 LabelId = "Label",
                 StatusId = "Status",
                 RecurrenceInfo = "Recurrence",
-                ResourceId = "Resources",                 
+                ResourceId = "Resources",
+                CustomFieldMappings = new List<DxSchedulerCustomFieldMapping> {
+                new DxSchedulerCustomFieldMapping { Name = "TextCss", Mapping = "TextCss" },
+                new DxSchedulerCustomFieldMapping { Name = "BackgroundCss", Mapping = "BackgroundCss" },
+                new DxSchedulerCustomFieldMapping{ Name = "Accepted", Mapping = "Accepted" }
+            }
             },
             ResourcesSource = ResourceCollection.GetResourcesForGrouping(),
             ResourceMappings = new DxSchedulerResourceMappings()
@@ -73,6 +100,7 @@ CssClass="demo-sc-size">
         XtraLocalizer.QueryLocalizedString +=
         new EventHandler<XtraLocalizer.QueryLocalizedStringEventArgs>(XtraLocalizer_QueryLocalizedString);
     }
+
     static private void XtraLocalizer_QueryLocalizedString(object sender, XtraLocalizer.QueryLocalizedStringEventArgs e)
     {
         if (e.StringIDType == typeof(DxBlazorStringId))
@@ -85,4 +113,6 @@ CssClass="demo-sc-size">
                 e.Value = "Search...";
         }
     }
+
+
 }

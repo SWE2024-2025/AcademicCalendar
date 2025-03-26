@@ -15,6 +15,8 @@
         public string Recurrence { get; set; }
         public int? ResourceId { get; set; }
         public string Resources { get; set; }
-        public bool Accepted { get; set; }
+        public string TextCss { get; set; }
+        public string BackgroundCss { get; set; }
+        
     }
 }

@@ -4,7 +4,7 @@
     {
         public static List<Resource> GetResourcesForGrouping()
         {
-            return GetResources().Take(5).ToList();
+            return GetResources().ToList();
         }
         public static List<Resource> GetResources()
         {
