@@ -31,6 +31,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 
 // Add services to the container.
+builder.Services.AddHttpClient();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddFluentUIComponents();

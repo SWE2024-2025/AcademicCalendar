@@ -3,20 +3,21 @@
 @using DevExpress.Utils.Localization;
 @using AcademicYearCalendar.Data
 @using System.Collections.Concurrent
+@inject IToastService ToastService
 
 @page "/"
 @rendermode InteractiveServer
 
 
 <PageTitle>التقويم</PageTitle>
-@* <FluentButton Appearance="Appearance.Accent" OnClick="SaveOnClick">Save</FluentButton> *@
+<FluentButton Appearance="Appearance.Accent" OnClick="SaveOnClick" IconStart="@(new MyIcons.Regular.Size20.Certificate())">Save</FluentButton>
 
 <DxScheduler @bind-StartDate="@StartDate"
 DataStorage="@DataStorage"
 GroupType="SchedulerGroupType.None"
 VisibleResourcesDataSource="VisibleResources"
-             FirstDayOfWeek="DayOfWeek.Saturday"
-             WorkDays="SchedulerWeekDays.Saturday | SchedulerWeekDays.Sunday | SchedulerWeekDays.Monday | SchedulerWeekDays.Tuesday | SchedulerWeekDays.Wednesday| SchedulerWeekDays.Thursday | SchedulerWeekDays.Friday"
+FirstDayOfWeek="DayOfWeek.Saturday"
+WorkDays="SchedulerWeekDays.Saturday | SchedulerWeekDays.Sunday | SchedulerWeekDays.Monday | SchedulerWeekDays.Tuesday | SchedulerWeekDays.Wednesday| SchedulerWeekDays.Thursday | SchedulerWeekDays.Friday"
 CssClass="demo-sc-size">
     <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="false" VisibleTime="timeRabge" > </DxSchedulerDayView>
     <DxSchedulerWeekView ShowWorkTimeOnly="false" VisibleTime="timeRabge"></DxSchedulerWeekView>
@@ -59,10 +60,11 @@ CssClass="demo-sc-size">
 
     public void SaveOnClick()
     {
-        foreach (string str in stringID)
-        {
+        ToastService.ShowInfo("error",5000);
+        // foreach (string str in stringID)
+        // {
             
-        }
+        // }
     }
 
     protected override async Task OnInitializedAsync()

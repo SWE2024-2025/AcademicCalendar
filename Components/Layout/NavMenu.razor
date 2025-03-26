@@ -18,9 +18,9 @@
 
                         @* <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.HomePerson())" IconColor="Color.Accent">@context.User.Identity?.Name</FluentNavLink> *@
                         <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.HomePerson())" IconColor="Color.Accent">الحساب</FluentNavLink>
-                        <FluentNavLink Href="/Settings/AcademicPrograms" Icon="@(new Icons.Regular.Size20.HomePerson())" IconColor="Color.Accent">البرامج الدراسة</FluentNavLink>
-                        <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.ScreenshotRecord())" IconColor="Color.Accent">المواد الدراسية</FluentNavLink>
-                        <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.ChartPerson())" IconColor="Color.Accent">هيئة اعضاء التدريس</FluentNavLink>
+                        <FluentNavLink Href="/Settings/AcademicPrograms" Icon="@(new MyIcons.Regular.Size20.Certificate())" IconColor="Color.Accent">البرامج الدراسة</FluentNavLink>
+                        <FluentNavLink Href="/Settings/StudySubjects" Icon="@(new Icons.Regular.Size20.ScreenshotRecord())" IconColor="Color.Accent">المواد الدراسية</FluentNavLink>
+                        <FluentNavLink Href="Account/Manage" Icon="@(new MyIcons.Regular.Size20.School())" IconColor="Color.Accent">هيئة اعضاء التدريس</FluentNavLink>
                         <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.LayerDiagonalPerson())" IconColor="Color.Accent">إدارة المستخدمين</FluentNavLink>
                     </FluentNavGroup>
                     <FluentNavLink Icon="@(new Icons.Regular.Size20.SignOut())" IconColor="Color.Accent" OnClick="OnLogoutClick">خروج</FluentNavLink>

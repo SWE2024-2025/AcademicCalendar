@@ -10,11 +10,11 @@
 
 <FluentGrid>
     <FluentGridItem xs="12" sm="6">
-        <EditForm Model="program" FormName="change-academicProgram" OnValidSubmit="OnValidSubmitAsync" method="post" novalidate>
+        <EditForm Model="StudySubject" FormName="change-StudySubject" OnValidSubmit="OnValidSubmitAsync" method="post" novalidate>
             <DataAnnotationsValidator />
             <FluentValidationSummary class="text-danger" role="alert" />
-            <FluentTextField Name="program.ProgramName" @bind-Value="program.ProgramName" Required="true" Placeholder="ادخل اسم البرنامج الدراسي" Label="اسم البرنامج الدراسي" Style="width: 100%" />
-            <FluentValidationMessage For="() => program.ProgramName" class="text-danger" />
+            <FluentTextField Name="program.ProgramName" @bind-Value="StudySubject.SubjectName" Required="true" Placeholder="ادخل اسم المادة الدراسية" Label="اسم المادة الدراسية" Style="width: 100%" />
+            <FluentValidationMessage For="() => StudySubject.SubjectName" class="text-danger" />
             <div style="display:flex">
                 <FluentSpacer />
                 <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Save())" Style="width: 25%;">حفظ</FluentButton>
@@ -23,7 +23,7 @@
                 <FluentSpacer />
             </div>
         </EditForm>
-        
+
 
     </FluentGridItem>
 </FluentGrid>
@@ -31,11 +31,8 @@
 
 @code {
     [Parameter]
-    public AcademicProgram AcademicProgram { get; set; }
+    public StudySubject StudySubject { get; set; }
 
-    private AcademicProgram program { get; set; }
-
-    
 
     [Parameter]
     public string Status { get; set; }
@@ -45,11 +42,9 @@
 
     protected override void OnInitialized()
     {
-        program = new AcademicProgram();
-        if (Status == "Edit")
+        if (Status == "Add")
         {
-            program.Id = AcademicProgram.Id;
-            program.ProgramName = AcademicProgram.ProgramName;
+            StudySubject = new StudySubject();
         }
     }
 
@@ -72,13 +67,12 @@
 
         if (Status == "Add")
         {
-            program.Id = AppDbContext.GetNextResourceId();
-            AppDbContext.AcademicProgram.Add(program);
+            StudySubject.Id = AppDbContext.GetNextResourceId();
+            AppDbContext.StudySubject.Add(StudySubject);
         }
         if (Status == "Edit")
         {
-            AcademicProgram.ProgramName = program.ProgramName;
-            AppDbContext.AcademicProgram.Update(AcademicProgram);
+            AppDbContext.StudySubject.Update(StudySubject);
         }
         
         AppDbContext.SaveChanges();

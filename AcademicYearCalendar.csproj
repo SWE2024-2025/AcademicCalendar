@@ -6,25 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-AcademicYearCalendar-9730f45e-bf63-444c-8a4d-48227970eb17</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Remove="Components\Account\Pages\ConfirmEmail.razor" />
-    <Content Remove="Components\Account\Pages\ConfirmEmailChange.razor" />
-    <Content Remove="Components\Account\Pages\ExternalLogin.razor" />
-    <Content Remove="Components\Account\Pages\ForgotPassword.razor" />
-    <Content Remove="Components\Account\Pages\ForgotPasswordConfirmation.razor" />
-    <Content Remove="Components\Account\Pages\InvalidPasswordReset.razor" />
-    <Content Remove="Components\Account\Pages\LoginWith2fa.razor" />
-    <Content Remove="Components\Account\Pages\Manage\DeletePersonalData.razor" />
-    <Content Remove="Components\Account\Pages\Manage\Disable2fa.razor" />
-    <Content Remove="Components\Account\Pages\Manage\EnableAuthenticator.razor" />
-    <Content Remove="Components\Account\Pages\Manage\ExternalLogins.razor" />
-    <Content Remove="Components\Account\Pages\Manage\GenerateRecoveryCodes.razor" />
-    <Content Remove="Components\Account\Pages\Manage\PersonalData.razor" />
-    <Content Remove="Components\Account\Pages\Manage\ResetAuthenticator.razor" />
-    <Content Remove="Components\Account\Pages\Manage\TwoFactorAuthentication.razor" />
-    <Content Remove="Components\Account\Shared\ExternalLoginPicker.razor" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DevExpress.Blazor" Version="24.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.*-*" />
@@ -38,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.11.6" />
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.11.6" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.11.7" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.11.7" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
   </ItemGroup>
 </Project>
