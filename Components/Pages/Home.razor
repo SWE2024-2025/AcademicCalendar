@@ -38,6 +38,7 @@ WorkDays="SchedulerWeekDays.Saturday | SchedulerWeekDays.Sunday | SchedulerWeekD
              AllowResizeAppointment="false"
              AllowDragAppointmentBetweenResources="false"
              ShowAppointmentTooltip="true"
+             ActiveViewType="SchedulerViewType.Week"
 CssClass="demo-sc-size">
     <Views>
             <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="false" VisibleTime="timeRabge"> </DxSchedulerDayView>
@@ -67,8 +68,7 @@ CssClass="demo-sc-size">
                 ResourceId = "Resources",
                 CustomFieldMappings = new List<DxSchedulerCustomFieldMapping> {
                 new DxSchedulerCustomFieldMapping { Name = "TextCss", Mapping = "TextCss" },
-                new DxSchedulerCustomFieldMapping { Name = "BackgroundCss", Mapping = "BackgroundCss" },
-                new DxSchedulerCustomFieldMapping{ Name = "Accepted", Mapping = "Accepted" }
+                new DxSchedulerCustomFieldMapping { Name = "BackgroundCss", Mapping = "BackgroundCss" }
             }
             },
             ResourcesSource = ResourceCollection.GetResourcesForGrouping(),
