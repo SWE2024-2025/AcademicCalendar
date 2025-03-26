@@ -35,6 +35,21 @@ namespace AcademicYearCalendar.Components
 
                     }
                 }
+                public class User : Icon
+                {
+                    public User() : base("User", IconVariant.Filled, IconSize.Size20, File.ReadAllText(@"wwwroot/Icons/user.svg"))
+                    {
+
+                    }
+                }
+
+                public class Settings : Icon
+                {
+                    public Settings() : base("Settings", IconVariant.Filled, IconSize.Size20, File.ReadAllText(@"wwwroot/Icons/settings.svg"))
+                    {
+
+                    }
+                }
             }
         }
     }

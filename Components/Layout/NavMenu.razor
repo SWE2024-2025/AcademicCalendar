@@ -14,10 +14,10 @@
             <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Calendar())" IconColor="Color.Accent">التقويم</FluentNavLink>            
             <AuthorizeView>
                 <Authorized>
-                    <FluentNavGroup Title="الاعدادات" Icon="@(new Icons.Regular.Size20.AppsSettings())" IconColor="Color.Accent">
+                    <FluentNavGroup Title="الاعدادات" Icon="@(new MyIcons.Regular.Size20.Settings())" IconColor="Color.Accent">
 
                         @* <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.HomePerson())" IconColor="Color.Accent">@context.User.Identity?.Name</FluentNavLink> *@
-                        <FluentNavLink Href="Account/Manage" Icon="@(new Icons.Regular.Size20.HomePerson())" IconColor="Color.Accent">الحساب</FluentNavLink>
+                        <FluentNavLink Href="Account/Manage" Icon="@(new MyIcons.Regular.Size20.User())" IconColor="Color.Accent">الحساب</FluentNavLink>
                         <FluentNavLink Href="Settings/AcademicPrograms" Icon="@(new MyIcons.Regular.Size20.Certificate())" IconColor="Color.Accent">البرامج الدراسة</FluentNavLink>
                         <FluentNavLink Href="Settings/StudySubjects" Icon="@(new Icons.Regular.Size20.ScreenshotRecord())" IconColor="Color.Accent">المواد الدراسية</FluentNavLink>
                         <FluentNavLink Href="Settings/Staffs" Icon="@(new MyIcons.Regular.Size20.School())" IconColor="Color.Accent">هيئة اعضاء التدريس</FluentNavLink>
