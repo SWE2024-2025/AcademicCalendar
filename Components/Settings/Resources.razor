@@ -54,10 +54,12 @@ else{
             </PropertyColumn>
             <PropertyColumn Property="@(p => p.ParentResource.Name)" Title="اسم الفئة" Sortable="true" Filtered="!string.IsNullOrWhiteSpace(nameFilter)">
                 <ColumnOptions>
-                    <div class="search-box">
-                        <FluentCombobox Placeholder="" Label="الفئات" Autofocus="true" @bind-SelectedOption=@selectedParebtResource  Items="@parentResources" OptionText="@(i => i.Name)" OptionValue="@(i => i.Id.ToString())" Width="80%" Height="200px" Immediate ImmediateDelay="100" />
-                        <FluentButton Appearance="Appearance.Accent" @onclick="()=> OnSearchClick()" IconStart="@(new Icons.Regular.Size16.Search())">بحث</FluentButton>
-                        <FluentIcon Value="@(new Icons.Regular.Size16.CircleHintDismiss())" @onclick="(()=>OnSelectedOptionChanged(null))" />
+                    <div class="search-box" style="width:100%">
+                        <FluentSelect Placeholder="" Label="الفئات" Autofocus="true" SelectedOptionChanged="@((Resource args)=> OnSelectedOptionChanged(args))" Items="@parentResources" OptionText="@(i => i.Name)" OptionValue="@(i => i.Id.ToString())" Width="80%" Height="200px" Immediate ImmediateDelay="100" />
+                        <div style="padding: 10px;display: flex">
+                            <FluentButton Appearance="Appearance.Accent" @onclick="()=> OnShowAllClick()" IconStart="@(new Icons.Regular.Size16.Search())" Style="margin:auto">عرض الكل</FluentButton>
+                            </div>
+                        
                     </div>
                 </ColumnOptions>
             </PropertyColumn>
@@ -140,6 +142,12 @@ else{
 
     void OnSearchClick()
     {
+        loadResources();
+    }
+
+    void OnShowAllClick()
+    {
+        selectedParebtResource = null;
         loadResources();
     }
 
