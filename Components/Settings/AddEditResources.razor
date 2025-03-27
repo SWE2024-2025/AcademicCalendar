@@ -79,14 +79,14 @@
     async Task ExitOnClick()
     {
         //AppDbContext.Entry(AcademicProgram).Reload();
-        // MessageService.ShowMessageBar(options =>
-        // {
-        //     options.Intent = MessageIntent.Warning;
-        //     options.Body = "لم يتم تعديل اي بيانات";
-        //     options.Timeout = 3000;
-        //     options.Section = "MESSAGES_TOP";
-        // });
-        ToastService.ShowInfo("لم يتم تعديل اي بيانات",3000);
+        MessageService.ShowMessageBar(options =>
+        {
+            options.Intent = MessageIntent.Warning;
+            options.Body = "لم يتم تعديل اي بيانات";
+            options.Timeout = 3000;
+            options.Section = "MESSAGES_TOP";
+        });
+        //ToastService.ShowInfo("لم يتم تعديل اي بيانات",3000);
         AppDbContext.ChangeTracker.Clear();
         await OnDone.InvokeAsync();
     }

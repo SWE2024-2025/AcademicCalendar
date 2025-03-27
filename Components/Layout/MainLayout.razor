@@ -8,8 +8,8 @@
         <NavMenu />
         <FluentBodyContent Class="body-content">
             <div class="content">
+                <FluentMessageBarProvider NewestOnTop="true" Section="MESSAGES_TOP" @rendermode="InteractiveServer" Style="width:50%;margin:auto" />
                 @Body
-                <FluentMessageBarProvider Section="MESSAGES_TOP" @rendermode="InteractiveServer" Style="width:50%;margin:auto" />
             </div>
         </FluentBodyContent>
         
