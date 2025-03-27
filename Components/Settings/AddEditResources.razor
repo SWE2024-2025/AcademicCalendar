@@ -1,0 +1,122 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using AcademicYearCalendar.Data
+@inject AppDbContext AppDbContext
+@rendermode InteractiveServer
+@inject IMessageService MessageService
+
+<h3>اضافة/تعديل بيانات المورد</h3>
+
+
+
+<FluentGrid>
+    <FluentGridItem xs="12" sm="6">
+        @if (IsParent)
+        {
+            <FluentTextField Placeholder="ادخل الاسم" @bind-Value="@ResourceName" Label="اسم الفئة" Style="width: 100%" />
+        }
+        else
+        {
+            <FluentCombobox Placeholder="" Label="الفئات" Autofocus="true" @bind-SelectedOption=@selectedResource Items="@ParentResources" OptionText="@(i => i.Name)" OptionValue="@(i => i.Id.ToString())" Width="80%" Height="200px" Immediate ImmediateDelay="100" />
+            <FluentTextField Placeholder="ادخل الاسم" @bind-Value="@ResourceName" Label="اسم المورد" Style="width: 100%" />
+        }
+
+
+        <div style="display:flex">
+            <FluentSpacer />
+            <FluentButton Type="ButtonType.Button" @onclick="OnSaveClick" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Save())" Style="width: 25%;">حفظ</FluentButton>
+            <FluentSpacer />
+            <FluentButton Type="ButtonType.Button" @onclick="ExitOnClick" Appearance="Appearance.Accent" IconStart="@(new MyIcons.Regular.Size16.Cancel())" Style="width: 25%;">رجوع</FluentButton>
+            <FluentSpacer />
+        </div>
+
+
+
+    </FluentGridItem>
+</FluentGrid>
+
+
+@code {
+    [Parameter]
+    public Resource Resource { get; set; }
+
+    [Parameter]
+    public bool IsParent { get; set; }
+
+
+    [Parameter]
+    public string Status { get; set; }
+
+    [Parameter]
+    public EventCallback OnDone { get; set; }
+
+    public string ResourceName { get; set; }
+    private Resource crResource { get; set; }
+    private IQueryable<Resource> ParentResources;
+    private Resource selectedResource;
+
+    protected override void OnInitialized()
+    {
+        loadResources();
+
+        if (Status == "Add")
+        {
+            Resource = new Resource();
+        }
+        if (Status == "Edit")
+        {
+            selectedResource = Resource.ParentResource;
+            ResourceName = Resource.Name;
+        }
+    }
+
+    private void loadResources()
+    {
+        ParentResources = AppDbContext.Resources.Where(r => r.ParentId == null);
+    }
+
+    async Task ExitOnClick()
+    {
+        //AppDbContext.Entry(AcademicProgram).Reload();
+        MessageService.ShowMessageBar(options =>
+        {
+            options.Intent = MessageIntent.Warning;
+            options.Body = "لم يتم تعديل اي بيانات";
+            options.Timeout = 3000;
+            options.Section = "MESSAGES_TOP";
+        });
+        AppDbContext.ChangeTracker.Clear();
+        await OnDone.InvokeAsync();
+    }
+
+    private async Task OnSaveClick()
+    {
+
+        if (Status == "Add")
+        {
+            //Staff.Id = AppDbContext.GetNextResourceId();
+            Resource.Name = ResourceName;
+            if (!IsParent)
+                Resource.ParentId = selectedResource.Id;
+            AppDbContext.Resources.Add(Resource);
+        }
+        if (Status == "Edit")
+        {
+            Resource.Name = ResourceName;
+            if (!IsParent)
+                Resource.ParentId = selectedResource.Id;
+            AppDbContext.Resources.Update(Resource);
+        }
+
+        AppDbContext.SaveChanges();
+
+        await MessageService.ShowMessageBarAsync(options =>
+        {
+            options.Intent = MessageIntent.Success;
+            options.Body = "تم حفظ البيانات بنجاح";
+            options.Timeout = 3000;
+            options.Section = "MESSAGES_TOP";
+        });
+
+        await OnDone.InvokeAsync();
+    }
+}

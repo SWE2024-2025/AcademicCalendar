@@ -4,6 +4,7 @@ using AcademicYearCalendar.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AcademicYearCalendar.Migrations.AppDb
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250327074631_update-Resources")]
+    partial class updateResources
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,12 +69,15 @@ namespace AcademicYearCalendar.Migrations.AppDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsGroup")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParentId")
-                        .HasColumnType("int");
 
                     b.Property<string>("TextCss")
                         .IsRequired()
@@ -79,7 +85,7 @@ namespace AcademicYearCalendar.Migrations.AppDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("GroupId");
 
                     b.ToTable("Resources");
                 });
@@ -147,7 +153,7 @@ namespace AcademicYearCalendar.Migrations.AppDb
                 {
                     b.HasOne("AcademicYearCalendar.Data.Resource", "ParentResource")
                         .WithMany("ChildrenResources")
-                        .HasForeignKey("ParentId")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentResource");

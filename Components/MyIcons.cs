@@ -50,6 +50,30 @@ namespace AcademicYearCalendar.Components
 
                     }
                 }
+
+                public class Schedule : Icon
+                {
+                    public Schedule() : base("Schedule", IconVariant.Filled, IconSize.Size20, File.ReadAllText(@"wwwroot/Icons/schedule.svg"))
+                    {
+
+                    }
+                }
+
+                public class Communities : Icon
+                {
+                    public Communities() : base("Communities", IconVariant.Filled, IconSize.Size20, File.ReadAllText(@"wwwroot/Icons/communities.svg"))
+                    {
+
+                    }
+                }
+
+                public class LinkedServices : Icon
+                {
+                    public LinkedServices() : base("LinkedServices", IconVariant.Filled, IconSize.Size20, File.ReadAllText(@"wwwroot/Icons/linked-services.svg"))
+                    {
+
+                    }
+                }
             }
         }
     }

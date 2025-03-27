@@ -4,6 +4,7 @@ using AcademicYearCalendar.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AcademicYearCalendar.Migrations.AppDb
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250327073631_Resources")]
+    partial class Resources
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,20 +69,21 @@ namespace AcademicYearCalendar.Migrations.AppDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsGroup")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParentId")
-                        .HasColumnType("int");
 
                     b.Property<string>("TextCss")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
 
                     b.ToTable("Resources");
                 });
@@ -141,21 +145,6 @@ namespace AcademicYearCalendar.Migrations.AppDb
                         .HasForeignKey("StudySubjectsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("AcademicYearCalendar.Data.Resource", b =>
-                {
-                    b.HasOne("AcademicYearCalendar.Data.Resource", "ParentResource")
-                        .WithMany("ChildrenResources")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("ParentResource");
-                });
-
-            modelBuilder.Entity("AcademicYearCalendar.Data.Resource", b =>
-                {
-                    b.Navigation("ChildrenResources");
                 });
 #pragma warning restore 612, 618
         }

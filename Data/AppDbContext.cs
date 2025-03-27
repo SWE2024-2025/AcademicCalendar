@@ -6,6 +6,8 @@ namespace AcademicYearCalendar.Data
 {
     public class AppDbContext : DbContext
     {
+        public DbSet<Resource> Resources { get; set; }
+
         public DbSet<AcademicProgram> AcademicProgram { get; set; }
         public DbSet<StudySubject> StudySubject { get; set; }
         public DbSet<Staff> Staff { get; set; }
@@ -19,6 +21,12 @@ namespace AcademicYearCalendar.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.HasSequence<int>("ResourceId");
+
+            modelBuilder.Entity<Resource>()
+            .HasOne(r => r.ParentResource)
+            .WithMany(r => r.ChildrenResources)
+            .HasForeignKey(r => r.ParentId)
+            .OnDelete(DeleteBehavior.Restrict); // Optional: prevent cascade delete
 
             modelBuilder.Entity<AcademicProgram>()
             .Property(e => e.Id);

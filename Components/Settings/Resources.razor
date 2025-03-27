@@ -1,0 +1,210 @@
+﻿@page "/settings/resources"
+@page "/settings/resources/{resourceType}"
+@using Microsoft.EntityFrameworkCore
+@using AcademicYearCalendar.Data
+@inject AppDbContext AppDbContext
+@inject PersistentComponentState ApplicationState
+@rendermode InteractiveServer
+@* @rendermode @(new InteractiveServerRenderMode(prerender: false)) *@
+
+
+
+@if (IsParent())
+{
+    <h3>إدارة الفئات</h3>
+}
+else{
+    <h3>إدارة الموارد</h3>
+}
+
+
+<hr />
+<div style="height:50px">
+</div>
+@if (Status == "Add" || Status == "Edit")
+{
+    <AddEditResources Resource="@selectedResource" IsParent="@IsParent()" Status="@Status" OnDone="OnDone"></AddEditResources>
+}
+
+@if (Status == "List")
+{
+    <FluentButton Appearance="Appearance.Accent" @onclick="AddOnClick" IconStart="@(new Icons.Regular.Size16.Add())">
+        @if (IsParent())
+        {
+            <span>اضافة فئة</span>
+        }
+        else
+        {
+            <span>اضافة مورد</span>
+        }
+    </FluentButton>
+    <FluentDataGrid @ref="grid" Items="@resources" MultiLine="true" Pagination="@pagination">
+        @if (IsParent())
+        {
+            <PropertyColumn Property="@(p => p.Name)" Title="اسم الفئة" />
+        }
+        else
+        {
+            <PropertyColumn Property="@(p => p.Name)" Title="اسم المورد" Sortable="true" Filtered="!string.IsNullOrWhiteSpace(nameFilter)" >
+                <ColumnOptions>
+                    <div class="search-box">
+                        <FluentSearch Autofocus=true @bind-Value=nameFilter @oninput="HandleNameFilter" @onkeydown="HandleCloseFilterAsync" @bind-Value:after="HandleClear" Placeholder="" Style="width: 100%;" Label="بحث" />
+                    </div>
+                </ColumnOptions>
+            </PropertyColumn>
+            <PropertyColumn Property="@(p => p.ParentResource.Name)" Title="اسم الفئة" Sortable="true" Filtered="!string.IsNullOrWhiteSpace(nameFilter)">
+                <ColumnOptions>
+                    <div class="search-box">
+                        <FluentCombobox Placeholder="" Label="الفئات" Autofocus="true" @bind-SelectedOption=@selectedParebtResource  Items="@parentResources" OptionText="@(i => i.Name)" OptionValue="@(i => i.Id.ToString())" Width="80%" Height="200px" Immediate ImmediateDelay="100" />
+                        <FluentButton Appearance="Appearance.Accent" @onclick="()=> OnSearchClick()" IconStart="@(new Icons.Regular.Size16.Search())">بحث</FluentButton>
+                        <FluentIcon Value="@(new Icons.Regular.Size16.CircleHintDismiss())" @onclick="(()=>OnSelectedOptionChanged(null))" />
+                    </div>
+                </ColumnOptions>
+            </PropertyColumn>
+        }
+        <TemplateColumn Title="">
+            <FluentButton Appearance="Appearance.Accent" @onclick="()=> EditOnClick(context)" IconStart="@(new Icons.Regular.Size16.Edit())">تعديل البيانات</FluentButton>
+        </TemplateColumn>
+    </FluentDataGrid>
+    <FluentPaginator State="@pagination" />
+}
+
+@code {
+    [Parameter]
+    public string? ResourceType { get; set; }
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+    private IQueryable<Resource> resources;
+    private Resource selectedResource;
+    private Resource selectedParebtResource;
+    private IQueryable<Resource> parentResources;
+
+    private string Status = "List";
+
+    string nameFilter = string.Empty;
+    FluentDataGrid<Resource>? grid;
+
+
+    protected override void OnInitialized()
+    {
+        
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            loadResources();
+            loadParentResources();
+            StateHasChanged();
+        }
+    }
+
+    private void loadResources()
+    {
+        if (IsParent())
+        {
+            resources = AppDbContext.Resources.Where(r => r.ParentId == null);
+        }
+        else
+        {
+            if (selectedParebtResource != null)
+            {
+                resources = AppDbContext.Resources.Where(r => r.ParentId != null && r.Name.Contains(nameFilter) && (r.ParentId == selectedParebtResource.Id)).Include(r => r.ParentResource);
+            }
+            else
+            {
+                resources = AppDbContext.Resources.Where(r => r.ParentId != null && r.Name.Contains(nameFilter)).Include(r => r.ParentResource);
+            }
+        }
+
+    }
+
+    private void loadParentResources()
+    {
+        parentResources = AppDbContext.Resources.Where(r => r.ParentId == null);
+    }
+
+    bool IsParent()
+    {
+        if (ResourceType == "groups")
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    #region ----------- Events -----------
+
+    void OnSearchClick()
+    {
+        loadResources();
+    }
+
+    void OnSelectedOptionChanged(Resource? args)
+    {
+        //SelectedOptionChanged="@((Resource args)=> OnSelectedOptionChanged(args))"
+        selectedParebtResource = args;
+        loadResources();
+    }
+
+    void AddOnClick()
+    {
+        Status = "Add";
+    }
+
+    void EditOnClick(Resource resource)
+    {
+        selectedResource = resource;
+        Status = "Edit";
+    }
+
+    void OnDone()
+    {
+        loadResources();
+        Status = "List";
+    }
+    #endregion
+
+    #region ----------- Filters Events -----------
+
+    private async Task HandleCloseFilterAsync(KeyboardEventArgs args)
+    {
+        if (args.Key == "Escape")
+        {
+            nameFilter = string.Empty;
+        }
+        if (args.Key == "Enter" && grid is not null)
+        {
+            await grid.CloseColumnOptionsAsync();
+        }
+    }
+
+    private void HandleNameFilter(ChangeEventArgs args)
+    {
+        if (args.Value is string value)
+        {
+            nameFilter = value;
+            loadResources();
+        }
+    }
+
+    private void HandleClear()
+    {
+        if (string.IsNullOrWhiteSpace(nameFilter))
+        {
+            nameFilter = string.Empty;
+            loadResources();
+        }
+    }
+
+    #endregion
+
+    
+
+   
+
+}
+

@@ -2,9 +2,9 @@
 @using DevExpress.Blazor.Localization;
 @using DevExpress.Utils.Localization;
 @using AcademicYearCalendar.Data
+@using AcademicYearCalendar.Components.Appointment
 @using System.Collections.Concurrent
 @inject IToastService ToastService
-
 @page "/"
 @rendermode InteractiveServer
 
@@ -45,6 +45,10 @@ CssClass="demo-sc-size">
             <DxSchedulerWeekView ShowWorkTimeOnly="false" VisibleTime="timeRabge"></DxSchedulerWeekView>
             <DxSchedulerMonthView ShowWorkDaysOnly="false" MonthCount="1"></DxSchedulerMonthView>
     </Views>    
+    @* <AppointmentTooltipHeaderTemplate>
+        <div class="tooltip-text-header">@context.Appointment.Subject</div>
+        <AppointmentTooltipHeader></AppointmentTooltipHeader>
+    </AppointmentTooltipHeaderTemplate> *@
 </DxScheduler>
 
 @code {
