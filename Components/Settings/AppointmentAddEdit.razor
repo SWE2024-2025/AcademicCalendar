@@ -9,41 +9,63 @@
 
 <FluentGrid Spacing="1" AdaptiveRendering="true">
     <FluentGridItem xs="12" sm="6">
-        <div>
-            <FluentTextField @bind-Value="@Appointment.Caption" Label="وصف الموعد" Style="width: 100%" />
-        </div>
-        <div></div>
+        <FluentTextField @bind-Value="@appointmentInfo.Caption" Label="وصف الموعد" Style="width: 100%" />
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"></FluentGridItem>
     <FluentGridItem xs="12" sm="6">
-        <div>
-            <FluentDatePicker Label="تاريخ الموعد" />
-            <FluentTimePicker  />            
-            <FluentTimePicker />
-        </div>
+        <FluentDatePicker Label="تاريخ الموعد" @bind-Value="@appointmentInfo.StartDate" />
+        <FluentTimePicker @bind-Value="@appointmentInfo.StartTime" />
+        <FluentTimePicker @bind-Value="@appointmentInfo.EndTime" />
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"></FluentGridItem>
     <FluentGridItem xs="12" sm="6">
-        <div>
-            <FluentSelect Items="@stringOptions1" Label="تكرار الموعد" Width="200px"></FluentSelect>
-        </div>
-    </FluentGridItem>
-    <FluentGridItem xs="12" sm="6"> </FluentGridItem>
-    <FluentGridItem xs="12" sm="6">
-        <div style="display:flex">
-            <FluentNumberField @bind-Value="exampleInt" Label="تكرار الموعد كل" Style="width:100px" />
-            <FluentLabel Typo="Typography.Subject"> يوم </FluentLabel>
-        </div>
-    </FluentGridItem>
-    <FluentGridItem xs="12" sm="6"> </FluentGridItem>
-    <FluentGridItem xs="12" sm="6">
-        <FluentDatePicker Label="نهاية التكرار" />
+        <FluentSelect TOption="string"  Label="تكرار الموعد" Width="200px" @bind-Value="@appointmentInfo.RepeatPeriod">
+            <FluentOption Value="0">بدون تكرار</FluentOption>
+            <FluentOption Value="1">يومي</FluentOption>
+            <FluentOption Value="2">اسبوعي</FluentOption>
+            <FluentOption Value="3">شهري</FluentOption>
+        </FluentSelect>
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"> </FluentGridItem>
     <FluentGridItem xs="12" sm="6">
         <div>
-            <FluentAutocomplete Items="@stringOptions1" AutoComplete="off" Label="موارد الموعد" Width="250px" Placeholder="" MaximumSelectedOptions="5" />
+            @if (int.Parse(appointmentInfo.RepeatPeriod) > 0)
+            {
+                <FluentNumberField @bind-Value="@appointmentInfo.RepeatedEvery" Label="تكرار الموعد كل" Style="width:60px" />
+                <label>@repeatPeriodText</label>
+                @* <FluentLabel Typo="Typography.Subject"> @repeatPeriodText </FluentLabel> *@
+            }
         </div>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6"> </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        @if (appointmentInfo.RepeatPeriod == "2")
+        {
+            <FluentSelect TOption="string" Label="يوم" Width="200px" @bind-Value="@appointmentInfo.WeekDay">
+                <FluentOption Value="1">السبت</FluentOption>
+                <FluentOption Value="2">الاحد</FluentOption>
+                <FluentOption Value="3">الاثنين</FluentOption>
+                <FluentOption Value="4">الثلاثاء</FluentOption>
+                <FluentOption Value="5">الاربعاء</FluentOption>
+                <FluentOption Value="6">الخميس</FluentOption>
+                <FluentOption Value="7">الجمعة</FluentOption>
+            </FluentSelect>
+        }
+        @if (appointmentInfo.RepeatPeriod == "3")
+        {
+            <FluentSelect Items="@monthDays" OptionText="p=>p.Text" OptionValue="p=>p.Value" Height="300px" Label="يوم" Width="200px" @bind-Value="@appointmentInfo.MonthDay"></FluentSelect>
+        }
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6"> </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        @if (int.Parse(appointmentInfo.RepeatPeriod) > 0)
+        {
+            <FluentDatePicker Label="نهاية التكرار" />
+        }
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6"> </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <FluentAutocomplete Items="@resources" OptionText="p=>p.Name" OptionValue="p=>p.Id.ToString()" @bind-SelectedOptions="@appointmentInfo.Resources" AutoComplete="off" Label="موارد الموعد" Width="100%" Placeholder="" MaximumSelectedOptions="10" />
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"></FluentGridItem>
     <FluentGridItem xs="12" sm="6">
@@ -69,28 +91,59 @@
     [Parameter]
     public EventCallback OnDone { get; set; }
 
-    int exampleInt { get; set; } = 123;
+    private AppointmentInfo appointmentInfo { get; set; }  = new AppointmentInfo();
 
-    static List<Option<string>> stringOptions1 = new()
+    private IQueryable<Resource> resources;
+
+    private string repeatPeriodText
     {
-        { new Option<string> { Value = "9", Text = "Nine", Icon = (new Icons.Regular.Size24.AppsList(), Color.Neutral, "start" ) } },
-        { new Option<string> { Value = "8", Text = "Eight", Selected = true } },
-        { new Option<string> { Value = "7", Text = "Seven" } },
-        { new Option<string> { Value = "6", Text = "Six" } },
-        { new Option<string> { Value = "5", Text = "Five" } },
-        { new Option<string> { Value = "4", Text = "Four" } },
-        { new Option<string> { Value = "3", Text = "Three" } },
-        { new Option<string> { Value = "2", Text = "Two" } },
-        { new Option<string> { Value = "1", Text = "One" } }
+        get
+        {
+            switch (appointmentInfo.RepeatPeriod)
+            {
+                case "1":
+                    return "يوم";
+                    break;
+                case "2":
+                    return "اسبوع";
+                    break;
+                case "3":
+                    return "شهر";
+                    break;
+                default:
+                    return "";
+            }
 
-    };
+        }
+    }
+
+    List<Option<string>> monthDays
+    {
+        get
+
+        {
+            var days = new List<Option<string>>();
+            for(int day = 1; day <= 31; day++)
+            {
+                days.Add(new Option<string>() { Value = day.ToString(), Text = day.ToString() });
+            }
+            return days;
+
+        }
+    }
 
     protected override void OnInitialized()
     {
+        loadResources();
         if (Status == "Add")
         {
             Appointment = new Appointment();
         }
+    }
+
+    private void loadResources()
+    {
+        resources = AppDbContext.Resources.Where(r => r.ParentId != null);
     }
 
     async Task ExitOnClick()
@@ -119,4 +172,27 @@
         ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
         await OnDone.InvokeAsync();
     }
+
+    private class AppointmentInfo
+    {
+        public string Caption { get; set; }
+
+        public DateTime? StartDate { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndtDate { get; set; }
+        public DateTime? EndTime { get; set; }
+
+        public string RepeatPeriod { get; set; } = "0"; // day , week,month
+
+        public int RepeatedEvery { get; set; } = 1; // 
+
+        public string WeekDay { get; set; } = "1";
+
+        public string MonthDay { get; set; } = "1";
+
+        public IEnumerable<Resource> Resources { get; set; } = Array.Empty<Resource>();
+
+    }
 }
+
+
