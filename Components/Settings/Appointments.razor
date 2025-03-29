@@ -1,6 +1,62 @@
 ﻿@page "/Settings/Appointments"
+@using Microsoft.EntityFrameworkCore
+@using AcademicYearCalendar.Data
+@inject AppDbContext AppDbContext
+@rendermode InteractiveServer
+
 <h3>إدارة التقويم</h3>
+<hr />
+<div style="height:50px">
+</div>
+@if (Status == "Add" || Status == "Edit")
+{
+    <AppointmentAddEdit Appointment="@selectedAppointment" Status="@Status" OnDone="OnDone"></AppointmentAddEdit>
+}
+
+@if (Status == "List")
+{
+    <FluentButton Appearance="Appearance.Accent" @onclick="AddOnClick" IconStart="@(new Icons.Regular.Size16.Add())">اضافة موعد</FluentButton>
+    <FluentDataGrid Items="@appointments" MultiLine="true" Pagination="@pagination">
+        <PropertyColumn Property="@(p => p.Caption)" Title="وصف الموعد" />
+        <PropertyColumn Property="@(p => $"{p.StartDate}-{p.EndDate}")" Title="تاريخ الموعد" />
+        <TemplateColumn Title="">
+            <FluentButton Appearance="Appearance.Accent" @onclick="()=> EditOnClick(context)" IconStart="@(new Icons.Regular.Size16.Edit())">تعديل البيانات</FluentButton>
+        </TemplateColumn>
+    </FluentDataGrid>
+    <FluentPaginator State="@pagination" />
+}
 
 @code {
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+    private IQueryable<Appointment> appointments;
+    private Appointment selectedAppointment;
+
+    private string Status = "List";
+
+    protected override void OnInitialized()
+    {
+        loadAppointments();
+    }
+
+    private void loadAppointments()
+    {
+        appointments = AppDbContext.Appointments;
+    }
+    void AddOnClick()
+    {
+        Status = "Add";
+    }
+
+    void EditOnClick(Appointment appointment)
+    {
+        selectedAppointment = appointment;
+        Status = "Edit";
+    }
+
+    void OnDone()
+    {
+        loadAppointments();
+        Status = "List";
+    }
 
 }

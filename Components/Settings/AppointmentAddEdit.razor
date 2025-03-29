@@ -1,0 +1,122 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using AcademicYearCalendar.Data
+@inject AppDbContext AppDbContext
+@rendermode InteractiveServer
+@inject IToastService ToastService
+@inject IMessageService MessageService
+
+<h3>اضافة/تعديل  الموعد</h3>
+
+<FluentGrid Spacing="1" AdaptiveRendering="true">
+    <FluentGridItem xs="12" sm="6">
+        <div>
+            <FluentTextField @bind-Value="@Appointment.Caption" Label="وصف الموعد" Style="width: 100%" />
+        </div>
+        <div></div>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6"></FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <div>
+            <FluentDatePicker Label="تاريخ الموعد" />
+            <FluentTimePicker  />            
+            <FluentTimePicker />
+        </div>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6"></FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <div>
+            <FluentSelect Items="@stringOptions1" Label="تكرار الموعد" Width="200px"></FluentSelect>
+        </div>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6"> </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <div style="display:flex">
+            <FluentNumberField @bind-Value="exampleInt" Label="تكرار الموعد كل" Style="width:100px" />
+            <FluentLabel Typo="Typography.Subject"> يوم </FluentLabel>
+        </div>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6"> </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <FluentDatePicker Label="نهاية التكرار" />
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6"> </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <div>
+            <FluentAutocomplete Items="@stringOptions1" AutoComplete="off" Label="موارد الموعد" Width="250px" Placeholder="" MaximumSelectedOptions="5" />
+        </div>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6"></FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <div style="display:flex">
+            <FluentSpacer />
+            <FluentButton Type="ButtonType.Button" @onclick="OnSaveClick" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Save())" Style="width: 25%;">حفظ</FluentButton>
+            <FluentSpacer />
+            <FluentButton Type="ButtonType.Button" @onclick="ExitOnClick" Appearance="Appearance.Accent" IconStart="@(new MyIcons.Regular.Size16.Cancel())" Style="width: 25%;">رجوع</FluentButton>
+            <FluentSpacer />
+        </div>
+    </FluentGridItem>
+</FluentGrid>
+
+
+@code {
+    [Parameter]
+    public Appointment Appointment { get; set; }
+
+
+    [Parameter]
+    public string Status { get; set; }
+
+    [Parameter]
+    public EventCallback OnDone { get; set; }
+
+    int exampleInt { get; set; } = 123;
+
+    static List<Option<string>> stringOptions1 = new()
+    {
+        { new Option<string> { Value = "9", Text = "Nine", Icon = (new Icons.Regular.Size24.AppsList(), Color.Neutral, "start" ) } },
+        { new Option<string> { Value = "8", Text = "Eight", Selected = true } },
+        { new Option<string> { Value = "7", Text = "Seven" } },
+        { new Option<string> { Value = "6", Text = "Six" } },
+        { new Option<string> { Value = "5", Text = "Five" } },
+        { new Option<string> { Value = "4", Text = "Four" } },
+        { new Option<string> { Value = "3", Text = "Three" } },
+        { new Option<string> { Value = "2", Text = "Two" } },
+        { new Option<string> { Value = "1", Text = "One" } }
+
+    };
+
+    protected override void OnInitialized()
+    {
+        if (Status == "Add")
+        {
+            Appointment = new Appointment();
+        }
+    }
+
+    async Task ExitOnClick()
+    {
+        //AppDbContext.Entry(AcademicProgram).Reload();
+        ToastService.ShowInfo("لم يتم تعديل اي بيانات", 3000);
+        AppDbContext.ChangeTracker.Clear();
+        await OnDone.InvokeAsync();
+    }
+
+    private async Task OnSaveClick()
+    {
+
+        if (Status == "Add")
+        {
+            Appointment.Id = AppDbContext.GetNextResourceId();
+            AppDbContext.Appointments.Add(Appointment);
+        }
+        if (Status == "Edit")
+        {
+            AppDbContext.Appointments.Update(Appointment);
+        }
+
+        AppDbContext.SaveChanges();
+
+        ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
+        await OnDone.InvokeAsync();
+    }
+}

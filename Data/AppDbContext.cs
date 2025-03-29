@@ -11,6 +11,10 @@ namespace AcademicYearCalendar.Data
         public DbSet<AcademicProgram> AcademicProgram { get; set; }
         public DbSet<StudySubject> StudySubject { get; set; }
         public DbSet<Staff> Staff { get; set; }
+
+        public DbSet<Appointment> Appointments { get; set; }
+
+        
         public DbSet<ResourceIdSequenceValue> SequenceValue { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
@@ -21,6 +25,14 @@ namespace AcademicYearCalendar.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.HasSequence<int>("ResourceId");
+
+            modelBuilder.Entity<Appointment>()
+                .Property(a => a.Recurrence)
+                .HasColumnType("xml");
+
+            modelBuilder.Entity<Appointment>()
+                .Property(a => a.Resources)
+                .HasColumnType("xml");
 
             modelBuilder.Entity<Resource>()
             .HasOne(r => r.ParentResource)
