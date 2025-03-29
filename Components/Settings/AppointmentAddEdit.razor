@@ -3,6 +3,7 @@
 @inject AppDbContext AppDbContext
 @rendermode InteractiveServer
 @inject IToastService ToastService
+@using DevExpress.Blazor
 @inject IMessageService MessageService
 
 <h3>اضافة/تعديل  الموعد</h3>
@@ -42,13 +43,13 @@
         @if (appointmentInfo.RepeatPeriod == "2")
         {
             <FluentSelect TOption="string" Label="يوم" Width="200px" @bind-Value="@appointmentInfo.WeekDay">
-                <FluentOption Value="1">السبت</FluentOption>
-                <FluentOption Value="2">الاحد</FluentOption>
-                <FluentOption Value="3">الاثنين</FluentOption>
+                <FluentOption Value="64">السبت</FluentOption>
+                <FluentOption Value="1">الاحد</FluentOption>
+                <FluentOption Value="2">الاثنين</FluentOption>
                 <FluentOption Value="4">الثلاثاء</FluentOption>
-                <FluentOption Value="5">الاربعاء</FluentOption>
-                <FluentOption Value="6">الخميس</FluentOption>
-                <FluentOption Value="7">الجمعة</FluentOption>
+                <FluentOption Value="8">الاربعاء</FluentOption>
+                <FluentOption Value="16">الخميس</FluentOption>
+                <FluentOption Value="32">الجمعة</FluentOption>
             </FluentSelect>
         }
         @if (appointmentInfo.RepeatPeriod == "3")
@@ -60,7 +61,7 @@
     <FluentGridItem xs="12" sm="6">
         @if (int.Parse(appointmentInfo.RepeatPeriod) > 0)
         {
-            <FluentDatePicker Label="نهاية التكرار" />
+            <FluentDatePicker Label="نهاية التكرار" @bind-Value="@appointmentInfo.RecurrenceEndDate" />
         }
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"> </FluentGridItem>
@@ -181,8 +182,9 @@
         public DateTime? StartTime { get; set; }
         public DateTime? EndtDate { get; set; }
         public DateTime? EndTime { get; set; }
+        public DateTime? RecurrenceEndDate { get; set; }
 
-        public string RepeatPeriod { get; set; } = "0"; // day , week,month
+        public string RepeatPeriod { get; set; } = "0"; // no repeat , day , week, month
 
         public int RepeatedEvery { get; set; } = 1; // 
 
@@ -191,6 +193,60 @@
         public string MonthDay { get; set; } = "1";
 
         public IEnumerable<Resource> Resources { get; set; } = Array.Empty<Resource>();
+
+        public Appointment GetDxSchedulerAppointment(Appointment _appointment)
+        {
+            Appointment appointment;
+            DxSchedulerRecurrenceInfo recurrenceInfo;
+            if (_appointment == null)
+                appointment = new Appointment();
+            else
+                appointment = _appointment;
+
+            appointment.Caption = this.Caption;
+
+            appointment.StartDate = new DateTime(this.StartDate.GetValueOrDefault().Year, this.StartDate.GetValueOrDefault().Month, this.StartDate.GetValueOrDefault().Day, this.StartTime.GetValueOrDefault().Hour, this.StartTime.GetValueOrDefault().Minute,0);
+            appointment.EndDate = new DateTime(this.StartDate.GetValueOrDefault().Year, this.StartDate.GetValueOrDefault().Month, this.StartDate.GetValueOrDefault().Day, this.EndTime.GetValueOrDefault().Hour, this.EndTime.GetValueOrDefault().Minute, 0);
+            if (int.Parse(this.RepeatPeriod) > 0)
+            {
+                recurrenceInfo = new DxSchedulerRecurrenceInfo();
+                recurrenceInfo.Id = Guid.NewGuid();
+                recurrenceInfo.Start = appointment.StartDate;
+                if (this.EndtDate == null)
+                {
+                    recurrenceInfo.Range = SchedulerRecurrenceRange.NoEndDate;
+                }
+                else
+                {
+                    recurrenceInfo.Range = SchedulerRecurrenceRange.EndByDate;
+                    recurrenceInfo.End = this.RecurrenceEndDate.GetValueOrDefault();
+                    if (int.Parse(this.RepeatPeriod) == 1)
+                    {
+                        recurrenceInfo.Type = SchedulerRecurrenceType.Daily;
+                    }
+                    if (int.Parse(this.RepeatPeriod) == 2)
+                    {
+                        recurrenceInfo.Type = SchedulerRecurrenceType.Weekly;
+                        recurrenceInfo.Frequency = this.RepeatedEvery;
+                        recurrenceInfo.WeekDays = (SchedulerWeekDays)int.Parse(this.WeekDay);
+                    }
+                    if (int.Parse(this.RepeatPeriod) == 3)
+                    {
+                        recurrenceInfo.Type = SchedulerRecurrenceType.Monthly;
+                        recurrenceInfo.DayNumber = int.Parse(this.MonthDay);
+                        recurrenceInfo.Frequency = this.RepeatedEvery;
+                    }
+                }
+                appointment.Recurrence = recurrenceInfo.ToXml();
+            }
+            if (this.Resources != null && this.Resources.Count() > 0)
+            {
+                var resources = this.Resources.Select(r => r.Id).ToArray();
+                appointment.Resources = DxSchedulerResourceIdCollection.ToXml(resources);
+            }
+
+            return appointment;
+        }
 
     }
 }

@@ -5,20 +5,21 @@
 @using AcademicYearCalendar.Components.Appointment
 @using System.Collections.Concurrent
 @inject IToastService ToastService
+@inject ResourceCollection resourceCollection;
 @page "/"
 @rendermode InteractiveServer
 
 <style>
     .dxbl-scroll-viewer > .dxbl-scroll-viewer-vert-scroll-bar > .dxbl-scroll-viewer-scroll-thumb {
-        display: none !important
+    display: none !important
     }
 
     .dxbl-scroll-viewer > .dxbl-scroll-viewer-hor-scroll-bar:not(.dxbl-disabled):not(:disabled).dxbl-active, .dxbl-scroll-viewer > .dxbl-scroll-viewer-vert-scroll-bar:not(.dxbl-disabled):not(:disabled).dxbl-active {
-        display: none !important
+    display: none !important
     }
 
     .dxbl-scroll-viewer-vert-scroll-bar dxbl-active {
-        display: none !important
+    display: none !important
     }
 </style>
 
@@ -31,19 +32,19 @@ GroupType="SchedulerGroupType.None"
 VisibleResourcesDataSource="VisibleResources"
 FirstDayOfWeek="DayOfWeek.Saturday"
 WorkDays="SchedulerWeekDays.Saturday | SchedulerWeekDays.Sunday | SchedulerWeekDays.Monday | SchedulerWeekDays.Tuesday | SchedulerWeekDays.Wednesday| SchedulerWeekDays.Thursday | SchedulerWeekDays.Friday"
-             AllowCreateAppointment="false"
-             AllowDeleteAppointment="false"
-             AllowEditAppointment="false"
-             AllowDragAppointment="false"
-             AllowResizeAppointment="false"
-             AllowDragAppointmentBetweenResources="false"
-             ShowAppointmentTooltip="true"
-             ActiveViewType="SchedulerViewType.Week"
+AllowCreateAppointment="false"
+AllowDeleteAppointment="false"
+AllowEditAppointment="false"
+AllowDragAppointment="false"
+AllowResizeAppointment="false"
+AllowDragAppointmentBetweenResources="false"
+ShowAppointmentTooltip="true"
+ActiveViewType="SchedulerViewType.Week"
 CssClass="demo-sc-size">
     <Views>
-            <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="false" VisibleTime="timeRabge"> </DxSchedulerDayView>
-            <DxSchedulerWeekView ShowWorkTimeOnly="false" VisibleTime="timeRabge"></DxSchedulerWeekView>
-            <DxSchedulerMonthView ShowWorkDaysOnly="false" MonthCount="1"></DxSchedulerMonthView>
+        <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="false" VisibleTime="timeRabge"> </DxSchedulerDayView>
+        <DxSchedulerWeekView ShowWorkTimeOnly="false" VisibleTime="timeRabge"></DxSchedulerWeekView>
+        <DxSchedulerMonthView ShowWorkDaysOnly="false" MonthCount="1"></DxSchedulerMonthView>
     </Views>    
     @* <AppointmentTooltipHeaderTemplate>
         <div class="tooltip-text-header">@context.Appointment.Subject</div>
@@ -54,37 +55,8 @@ CssClass="demo-sc-size">
 @code {
 
     DateTime StartDate { get; set; } = DateTime.Today;
-    DxSchedulerDataStorage DataStorage = new DxSchedulerDataStorage()
-        {
-            AppointmentsSource = ResourceAppointmentCollection.GetAppointments(),
-            AppointmentMappings = new DxSchedulerAppointmentMappings()
-            {
-                Type = "AppointmentType",
-                Start = "StartDate",
-                End = "EndDate",
-                Subject = "Caption",
-                AllDay = "AllDay",                
-                Description = "Description",
-                LabelId = "Label",
-                StatusId = "Status",
-                RecurrenceInfo = "Recurrence",
-                ResourceId = "Resources",
-                CustomFieldMappings = new List<DxSchedulerCustomFieldMapping> {
-                new DxSchedulerCustomFieldMapping { Name = "TextColor", Mapping = "TextColor" },
-                new DxSchedulerCustomFieldMapping { Name = "TextColor", Mapping = "TextColor" }
-            }
-            },
-            ResourcesSource = ResourceCollection.GetResourcesForGrouping(),
-            ResourceMappings = new DxSchedulerResourceMappings()
-            {
-                Id = "Id",
-                Caption = "Name",
-                BackgroundCssClass = "BackgroundCss",
-                TextCssClass = "TextCss"
-            },
-            EnableMultipleResources = true
-        };
-    List<Resource> VisibleResources = ResourceCollection.GetResources().ToList();
+    DxSchedulerDataStorage DataStorage;
+    List<Resource> VisibleResources ;
     DxSchedulerTimeSpanRange timeRabge = new DxSchedulerTimeSpanRange(new TimeSpan(7,0,0), new TimeSpan(23,0,0));
     static ConcurrentBag<string> stringID = new ConcurrentBag<string>();
 
@@ -99,6 +71,38 @@ CssClass="demo-sc-size">
 
     protected override async Task OnInitializedAsync()
     {
+        DataStorage = new DxSchedulerDataStorage()
+            {
+                AppointmentsSource = ResourceAppointmentCollection.GetAppointments(),
+                AppointmentMappings = new DxSchedulerAppointmentMappings()
+                {
+                    Type = "AppointmentType",
+                    Start = "StartDate",
+                    End = "EndDate",
+                    Subject = "Caption",
+                    AllDay = "AllDay",
+                    Description = "Description",
+                    LabelId = "Label",
+                    StatusId = "Status",
+                    RecurrenceInfo = "Recurrence",
+                    ResourceId = "Resources",
+                    CustomFieldMappings = new List<DxSchedulerCustomFieldMapping> {
+                new DxSchedulerCustomFieldMapping { Name = "TextColor", Mapping = "TextColor" },
+                new DxSchedulerCustomFieldMapping { Name = "TextColor", Mapping = "TextColor" }
+            }
+                },
+                ResourcesSource = resourceCollection.GetResourcesForGrouping(),
+                ResourceMappings = new DxSchedulerResourceMappings()
+                {
+                    Id = "Id",
+                    Caption = "Name",
+                    BackgroundCssClass = "BackgroundCss",
+                    TextCssClass = "TextCss"
+                },
+                EnableMultipleResources = true
+            };
+        List<Resource> VisibleResources = resourceCollection.GetResources().ToList();
+
         XtraLocalizer.HandleAllThreadEvents();
         XtraLocalizer.QueryLocalizedString +=
         new EventHandler<XtraLocalizer.QueryLocalizedStringEventArgs>(XtraLocalizer_QueryLocalizedString);

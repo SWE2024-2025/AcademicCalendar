@@ -1,12 +1,25 @@
-﻿namespace AcademicYearCalendar.Data
+﻿using Microsoft.EntityFrameworkCore;
+using AcademicYearCalendar.Data;
+
+namespace AcademicYearCalendar.Data
 {
-    public static partial class ResourceCollection
+    public class ResourceCollection
     {
-        public static List<Resource> GetResourcesForGrouping()
-        {
-            return GetResources().ToList();
+        AppDbContext AppDbContext;
+        public ResourceCollection(AppDbContext appDbContext) {
+            AppDbContext = appDbContext;
         }
-        public static List<Resource> GetResources()
+        public List<Resource> GetResourcesForGrouping()
+        {
+            return AppDbContext.Resources.Where(r => r.ParentId == null).ToList();
+            //return GetResources().ToList();
+        }
+
+        public List<Resource> GetResources()
+        {
+            return AppDbContext.Resources.Where(r=>r.ParentId != null).ToList();
+        }
+        private List<Resource> GetResources_old()
         {
             return new List<Resource>() {
                 new Resource() { Id=0 , Name="دبلوم هندسة البرمجيات", ParentId=100, BackgroundCss="dxbl-green-color", TextCss="text-white" },
@@ -20,7 +33,13 @@
                 new Resource() { Id=8 , Name="د. رضا احمد عبد الصادق", ParentId=200, BackgroundCss="dxbl-red-color", TextCss="text-white" }
             };
         }
-        public static List<Resource> GetResourceGroups()
+
+        public List<Resource> GetResourceGroups()
+        {
+            return AppDbContext.Resources.Where(r => r.ParentId == null).ToList();
+        }
+
+        private List<Resource> GetResourceGroups_old()
         {
             return new List<Resource>() {
                 new Resource() { Id=100, Name="البرامج المهنية"},

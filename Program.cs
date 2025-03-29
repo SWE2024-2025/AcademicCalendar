@@ -75,6 +75,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>  options.SignIn.Req
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
+builder.Services.AddScoped<ResourceCollection>();
+
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
