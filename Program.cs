@@ -76,6 +76,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>  options.SignIn.Req
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<ResourceCollection>();
+builder.Services.AddScoped<ResourceAppointmentCollection>();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 

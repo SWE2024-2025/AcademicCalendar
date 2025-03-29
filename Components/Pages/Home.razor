@@ -6,6 +6,7 @@
 @using System.Collections.Concurrent
 @inject IToastService ToastService
 @inject ResourceCollection resourceCollection;
+@inject ResourceAppointmentCollection appointmentCollection;
 @page "/"
 @rendermode InteractiveServer
 
@@ -73,7 +74,7 @@ CssClass="demo-sc-size">
     {
         DataStorage = new DxSchedulerDataStorage()
             {
-                AppointmentsSource = ResourceAppointmentCollection.GetAppointments(),
+                AppointmentsSource = appointmentCollection.GetAppointments(),
                 AppointmentMappings = new DxSchedulerAppointmentMappings()
                 {
                     Type = "AppointmentType",

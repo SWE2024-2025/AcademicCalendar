@@ -11,7 +11,8 @@ namespace AcademicYearCalendar.Data
         }
         public List<Resource> GetResourcesForGrouping()
         {
-            return AppDbContext.Resources.Where(r => r.ParentId == null).ToList();
+            //return AppDbContext.Resources.Where(r => r.ParentId == null).ToList();
+            return AppDbContext.Resources.ToList();
             //return GetResources().ToList();
         }
 

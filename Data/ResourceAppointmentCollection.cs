@@ -1,10 +1,22 @@
 ﻿using DevExpress.Blazor;
+using Microsoft.EntityFrameworkCore;
+using AcademicYearCalendar.Data;
+using System;
 
 namespace AcademicYearCalendar.Data
 {
-    public static partial class ResourceAppointmentCollection
+    public  class ResourceAppointmentCollection
     {
-        public static List<Appointment> GetAppointments()
+        AppDbContext AppDbContext;
+        public ResourceAppointmentCollection(AppDbContext appDbContext) {
+            AppDbContext = appDbContext;
+        }
+
+        public List<Appointment> GetAppointments()
+        {
+            return AppDbContext.Appointments.ToList();
+        }
+        private  List<Appointment> GetAppointments_OLD()
         {
             
             DateTime date = DateTime.Now.Date;

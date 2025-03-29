@@ -66,7 +66,7 @@
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"> </FluentGridItem>
     <FluentGridItem xs="12" sm="6">
-        <FluentAutocomplete Items="@resources" OptionText="p=>p.Name" OptionValue="p=>p.Id.ToString()" @bind-SelectedOptions="@appointmentInfo.Resources" AutoComplete="off" Label="موارد الموعد" Width="100%" Placeholder="" MaximumSelectedOptions="10" />
+        <FluentAutocomplete Items="@resources" OptionText="p=>p.Name" OptionValue="p=>p.Id.ToString()" Height="300px" @bind-SelectedOptions="@appointmentInfo.Resources" AutoComplete="off" Label="موارد الموعد" Width="100%" Placeholder="" />
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"></FluentGridItem>
     <FluentGridItem xs="12" sm="6">
@@ -140,6 +140,10 @@
         {
             Appointment = new Appointment();
         }
+        if (Status == "Edit")
+        {
+            appointmentInfo.SetAppointmentInfo(Appointment,resources);
+        }
     }
 
     private void loadResources()
@@ -160,7 +164,7 @@
 
         if (Status == "Add")
         {
-            Appointment.Id = AppDbContext.GetNextResourceId();
+            Appointment = appointmentInfo.GetDxSchedulerAppointment(Appointment);
             AppDbContext.Appointments.Add(Appointment);
         }
         if (Status == "Edit")
@@ -207,12 +211,15 @@
 
             appointment.StartDate = new DateTime(this.StartDate.GetValueOrDefault().Year, this.StartDate.GetValueOrDefault().Month, this.StartDate.GetValueOrDefault().Day, this.StartTime.GetValueOrDefault().Hour, this.StartTime.GetValueOrDefault().Minute,0);
             appointment.EndDate = new DateTime(this.StartDate.GetValueOrDefault().Year, this.StartDate.GetValueOrDefault().Month, this.StartDate.GetValueOrDefault().Day, this.EndTime.GetValueOrDefault().Hour, this.EndTime.GetValueOrDefault().Minute, 0);
+            appointment.AppointmentType = (int)SchedulerAppointmentType.OneTime;
+            appointment.Status = 2;
             if (int.Parse(this.RepeatPeriod) > 0)
             {
+                appointment.AppointmentType = (int)SchedulerAppointmentType.Pattern;
                 recurrenceInfo = new DxSchedulerRecurrenceInfo();
                 recurrenceInfo.Id = Guid.NewGuid();
                 recurrenceInfo.Start = appointment.StartDate;
-                if (this.EndtDate == null)
+                if (this.RecurrenceEndDate == null)
                 {
                     recurrenceInfo.Range = SchedulerRecurrenceRange.NoEndDate;
                 }
@@ -248,6 +255,15 @@
             return appointment;
         }
 
+        public void SetAppointmentInfo(Appointment _appointment, IQueryable<Resource> resources)
+        {
+            this.Caption = _appointment.Caption;
+            this.StartDate = _appointment.StartDate;
+            this.StartTime = _appointment.StartDate;
+            this.EndTime = _appointment.EndDate;
+            var res = DxSchedulerResourceIdCollection.FromXml(_appointment.Resources).Select(r=> (int)r).ToArray();
+            this.Resources = resources.Where(r => res.Contains(r.Id));
+        }
     }
 }
 
