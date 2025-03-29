@@ -66,7 +66,7 @@
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"> </FluentGridItem>
     <FluentGridItem xs="12" sm="6">
-        <FluentAutocomplete Items="@resources" OptionText="p=>p.Name" OptionValue="p=>p.Id.ToString()" Height="300px" @bind-SelectedOptions="@appointmentInfo.Resources" AutoComplete="off" Label="موارد الموعد" Width="100%" Placeholder="" />
+        <FluentAutocomplete Items="@resources" TOption="Resource" OnOptionsSearch="@OnSearch" OptionText="p=>p.Name" OptionValue="p=>p.Id.ToString()" Height="300px" @bind-SelectedOptions="@appointmentInfo.Resources" AutoComplete="off" Label="موارد الموعد" Width="100%" Placeholder="" />
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"></FluentGridItem>
     <FluentGridItem xs="12" sm="6">
@@ -94,7 +94,7 @@
 
     private AppointmentInfo appointmentInfo { get; set; }  = new AppointmentInfo();
 
-    private IQueryable<Resource> resources;
+    private List<Resource> resources;
 
     private string repeatPeriodText
     {
@@ -148,7 +148,13 @@
 
     private void loadResources()
     {
-        resources = AppDbContext.Resources.Where(r => r.ParentId != null);
+        resources = AppDbContext.Resources.Where(r => r.ParentId != null).ToList();
+    }
+
+    private void OnSearch(OptionsSearchEventArgs<Resource> e)
+    {
+        e.Items = resources.Where(i => i.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase))
+                             .OrderBy(i => i.Name);
     }
 
     async Task ExitOnClick()
@@ -169,6 +175,7 @@
         }
         if (Status == "Edit")
         {
+            Appointment = appointmentInfo.GetDxSchedulerAppointment(Appointment);
             AppDbContext.Appointments.Update(Appointment);
         }
 
@@ -200,12 +207,8 @@
 
         public Appointment GetDxSchedulerAppointment(Appointment _appointment)
         {
-            Appointment appointment;
+            Appointment appointment = _appointment;
             DxSchedulerRecurrenceInfo recurrenceInfo;
-            if (_appointment == null)
-                appointment = new Appointment();
-            else
-                appointment = _appointment;
 
             appointment.Caption = this.Caption;
 
@@ -255,7 +258,7 @@
             return appointment;
         }
 
-        public void SetAppointmentInfo(Appointment _appointment, IQueryable<Resource> resources)
+        public void SetAppointmentInfo(Appointment _appointment, List<Resource> resources)
         {
             this.Caption = _appointment.Caption;
             this.StartDate = _appointment.StartDate;
@@ -263,6 +266,35 @@
             this.EndTime = _appointment.EndDate;
             var res = DxSchedulerResourceIdCollection.FromXml(_appointment.Resources).Select(r=> (int)r).ToArray();
             this.Resources = resources.Where(r => res.Contains(r.Id));
+            if (_appointment.Recurrence != null)
+            {
+                DxSchedulerRecurrenceInfo recurrenceInfo = new DxSchedulerRecurrenceInfo();
+                recurrenceInfo.FromXml(_appointment.Recurrence);
+                if (recurrenceInfo.Type == SchedulerRecurrenceType.Daily)
+                {
+                    this.RepeatPeriod = "1";
+                }
+                if (recurrenceInfo.Type == SchedulerRecurrenceType.Weekly)
+                {
+                    this.RepeatPeriod = "2";
+                    this.RepeatedEvery = recurrenceInfo.Frequency;
+                    this.WeekDay = ((int)recurrenceInfo.WeekDays).ToString();
+                }
+                if (recurrenceInfo.Type == SchedulerRecurrenceType.Monthly)
+                {
+                    this.RepeatPeriod = "3";
+                    this.RepeatedEvery = recurrenceInfo.Frequency;
+                    this.MonthDay = recurrenceInfo.DayNumber.ToString();
+                }
+                if (recurrenceInfo.Range == SchedulerRecurrenceRange.EndByDate)
+                {
+                    this.RecurrenceEndDate = recurrenceInfo.End;
+                }
+            }
+            else
+            {
+                this.RepeatPeriod = "0";
+            }
         }
     }
 }
