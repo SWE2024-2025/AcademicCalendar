@@ -69,7 +69,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
 
-builder.Services.AddIdentityCore<ApplicationUser>(options =>  options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentityCore<ApplicationUser>(options =>  options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()  // Add this to enable roles
     .AddEntityFrameworkStores<AppIdentityDbContext>()
     .AddSignInManager()

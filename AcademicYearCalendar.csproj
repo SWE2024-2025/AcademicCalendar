@@ -6,6 +6,45 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-AcademicYearCalendar-9730f45e-bf63-444c-8a4d-48227970eb17</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\AcademicProgram.cs" />
+    <Compile Remove="Data\Staff.cs" />
+    <Compile Remove="Data\StudySubject.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Components\Account\Pages\ConfirmEmail.razor" />
+    <Content Remove="Components\Account\Pages\ConfirmEmailChange.razor" />
+    <Content Remove="Components\Account\Pages\ExternalLogin.razor" />
+    <Content Remove="Components\Account\Pages\ForgotPassword.razor" />
+    <Content Remove="Components\Account\Pages\ForgotPasswordConfirmation.razor" />
+    <Content Remove="Components\Account\Pages\InvalidPasswordReset.razor" />
+    <Content Remove="Components\Account\Pages\InvalidUser.razor" />
+    <Content Remove="Components\Account\Pages\LoginWith2fa.razor" />
+    <Content Remove="Components\Account\Pages\LoginWithRecoveryCode.razor" />
+    <Content Remove="Components\Account\Pages\Manage\Disable2fa.razor" />
+    <Content Remove="Components\Account\Pages\Manage\EnableAuthenticator.razor" />
+    <Content Remove="Components\Account\Pages\Manage\ExternalLogins.razor" />
+    <Content Remove="Components\Account\Pages\Manage\GenerateRecoveryCodes.razor" />
+    <Content Remove="Components\Account\Pages\Manage\ResetAuthenticator.razor" />
+    <Content Remove="Components\Account\Pages\Manage\SetPassword.razor" />
+    <Content Remove="Components\Account\Pages\Manage\TwoFactorAuthentication.razor" />
+    <Content Remove="Components\Account\Pages\Register.razor" />
+    <Content Remove="Components\Account\Pages\RegisterConfirmation.razor" />
+    <Content Remove="Components\Account\Pages\ResendEmailConfirmation.razor" />
+    <Content Remove="Components\Account\Pages\ResetPassword.razor" />
+    <Content Remove="Components\Account\Pages\ResetPasswordConfirmation.razor" />
+    <Content Remove="Components\Account\Shared\ExternalLoginPicker.razor" />
+    <Content Remove="Components\Account\Shared\ShowRecoveryCodes.razor" />
+    <Content Remove="Components\Settings\AcademicPrograms.razor" />
+    <Content Remove="Components\Settings\AddEditAcademicProgram.razor" />
+    <Content Remove="Components\Settings\AddEditStaff.razor" />
+    <Content Remove="Components\Settings\AddEditStudySubject.razor" />
+    <Content Remove="Components\Settings\EditAcademicProgramSubjects.razor" />
+    <Content Remove="Components\Settings\Staffs.razor" />
+    <Content Remove="Components\Settings\StudySubjects.razor" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DevExpress.Blazor" Version="24.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.*-*" />

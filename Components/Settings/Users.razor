@@ -1,7 +1,110 @@
-﻿@page "/Settings/Users"
+﻿@page "/settings/users"
+@using Microsoft.EntityFrameworkCore
+@using AcademicYearCalendar.Data
+@using AcademicYearCalendar.Components.Account
+@using Microsoft.AspNetCore.Identity;
+@inject AppIdentityDbContext AppIdentityDbContext
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IdentityUserAccessor UserAccessor
+@rendermode InteractiveServer
 
 <h3>إدارة المستخدمين</h3>
 
+<hr />
+<div style="height:50px">
+</div>
+@if (Status == "Add" || Status == "Edit")
+{
+    <UsersAddEdit User="@selectedApplicationUser" Status="@Status" OnDone="OnDone"></UsersAddEdit>
+}
+@if (Status == "EditPass")
+{
+    <UserEditPassword User="@selectedApplicationUser" OnDone="OnDone"></UserEditPassword>
+}
+@if (Status == "List")
+{
+    <FluentButton Appearance="Appearance.Accent" @onclick="AddOnClick" IconStart="@(new Icons.Regular.Size16.Add())">اضافة المستخدم</FluentButton>
+    <FluentDataGrid Items="@applicationUsers" MultiLine="true" Pagination="@pagination">
+        <PropertyColumn Property="@(p => p.FullName)" Title="اسم المستخدم" />
+        <PropertyColumn Property="@(p => p.UserEmail)" Title="البريد الالكتروني" />
+        <PropertyColumn Property="@(p => p.UserName)" Title="اسم الدخول" />
+        <TemplateColumn Title="الصلاحيات">
+            @foreach (var role in context.Roles)
+            {
+                <div>
+                    @role.RoleName
+                </div>
+            }
+        </TemplateColumn>
+        <TemplateColumn Title="">
+            <FluentButton Appearance="Appearance.Accent" @onclick="()=> EditOnClick(context)" IconStart="@(new Icons.Regular.Size16.Edit())">تعديل البيانات</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" @onclick="()=> EditPasswordOnClick(context)" IconStart="@(new Icons.Regular.Size16.Password())">تعديل كلمة المرور</FluentButton>
+        </TemplateColumn>
+    </FluentDataGrid>
+    <FluentPaginator State="@pagination" />
+}
+
 @code {
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+    private IQueryable<UserWithRolesDto> applicationUsers;
+    private UserWithRolesDto selectedApplicationUser;
+
+    private string Status = "List";
+
+    protected override void OnInitialized()
+    {
+        
+        loadUsers();
+    }
+
+    private void loadUsers()
+    {
+        applicationUsers = from user in AppIdentityDbContext.Users
+                           join userRole in AppIdentityDbContext.UserRoles on user.Id equals userRole.UserId
+                           join role in AppIdentityDbContext.Roles on userRole.RoleId equals role.Id
+                           group new { role.Id, role.Name } by new
+                           {
+                               user.Id,
+                               user.FullName,
+                               user.Email,
+                               user.UserName
+                           } into g
+                           select new UserWithRolesDto
+                               {
+                                   UserId = g.Key.Id,
+                                   UserName = g.Key.UserName,
+                                   UserEmail = g.Key.Email,
+                                   FullName = g.Key.FullName,
+                                   Roles = g.Select(r => new RoleDto
+                                   {
+                                       RoleId = r.Id,
+                                       RoleName = r.Name
+                                   }).ToList()
+                               };
+    }
+
+    void AddOnClick()
+    {
+        Status = "Add";
+    }
+
+    void EditOnClick(UserWithRolesDto user)
+    {
+        selectedApplicationUser = user;
+        Status = "Edit";
+    }
+
+    void EditPasswordOnClick(UserWithRolesDto user)
+    {
+        selectedApplicationUser = user;
+        Status = "EditPass";
+    }
+
+    void OnDone()
+    {
+        loadUsers();
+        Status = "List";
+    }
 
 }

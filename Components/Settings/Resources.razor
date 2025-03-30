@@ -31,7 +31,7 @@ else{
 </div>
 @if (Status == "Add" || Status == "Edit")
 {
-    <AddEditResources Resource="@selectedResource" IsParent="@IsParent()" Status="@Status" OnDone="OnDone"></AddEditResources>
+    <ResourcesAddEdit Resource="@selectedResource" IsParent="@IsParent()" Status="@Status" OnDone="OnDone"></ResourcesAddEdit>
 }
 
 @if (Status == "List")

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Xml;
-using static AcademicYearCalendar.Components.Settings.AddEditAcademicProgram;
 
 namespace AcademicYearCalendar.Data
 {
@@ -8,14 +7,14 @@ namespace AcademicYearCalendar.Data
     {
         public DbSet<Resource> Resources { get; set; }
 
-        public DbSet<AcademicProgram> AcademicProgram { get; set; }
-        public DbSet<StudySubject> StudySubject { get; set; }
-        public DbSet<Staff> Staff { get; set; }
+        //public DbSet<AcademicProgram> AcademicProgram { get; set; }
+        //public DbSet<StudySubject> StudySubject { get; set; }
+        //public DbSet<Staff> Staff { get; set; }
 
         public DbSet<Appointment> Appointments { get; set; }
 
         
-        public DbSet<ResourceIdSequenceValue> SequenceValue { get; set; }
+        //public DbSet<ResourceIdSequenceValue> SequenceValue { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
         {
@@ -40,37 +39,37 @@ namespace AcademicYearCalendar.Data
             .HasForeignKey(r => r.ParentId)
             .OnDelete(DeleteBehavior.Restrict); // Optional: prevent cascade delete
 
-            modelBuilder.Entity<AcademicProgram>()
-            .Property(e => e.Id);
-            //.HasDefaultValueSql("NEXT VALUE FOR ResourceId");
+            //modelBuilder.Entity<AcademicProgram>()
+            //.Property(e => e.Id);
+            ////.HasDefaultValueSql("NEXT VALUE FOR ResourceId");
 
-            modelBuilder.Entity<StudySubject>()
-            .Property(e => e.Id);
+            //modelBuilder.Entity<StudySubject>()
+            //.Property(e => e.Id);
 
-            modelBuilder.Entity<Staff>()
-           .Property(e => e.Id);
+            //modelBuilder.Entity<Staff>()
+           //.Property(e => e.Id);
 
-            modelBuilder.Entity<ResourceIdSequenceValue>()
-            .HasNoKey().ToView(null);
+            //modelBuilder.Entity<ResourceIdSequenceValue>()
+            //.HasNoKey().ToView(null);
         }
 
 
-        public int GetNextResourceId()
-        {
-            var result = this.Set<ResourceIdSequenceValue>()
-                .FromSqlRaw("SELECT NEXT VALUE FOR ResourceId AS Value")
-                .ToList();
+        //public int GetNextResourceId()
+        //{
+        //    var result = this.Set<ResourceIdSequenceValue>()
+        //        .FromSqlRaw("SELECT NEXT VALUE FOR ResourceId AS Value")
+        //        .ToList();
 
-            var nextId = result.First().Value;
-            return (int)nextId;
-        }
+        //    var nextId = result.First().Value;
+        //    return (int)nextId;
+        //}
        
     }
 
-    public class ResourceIdSequenceValue
-    {
-        public long Value { get; set; }
-    }
+    //public class ResourceIdSequenceValue
+    //{
+    //    public long Value { get; set; }
+    //}
 
 
 }

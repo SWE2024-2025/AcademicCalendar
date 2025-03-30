@@ -1,0 +1,139 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using AcademicYearCalendar.Data
+@using AcademicYearCalendar.Components.Account
+@using Microsoft.AspNetCore.Identity;
+@inject AppIdentityDbContext AppIdentityDbContext
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IdentityUserAccessor UserAccessor
+@inject IToastService ToastService
+@rendermode InteractiveServer
+
+<h3>اضافة/تعديل بيانات مستخدم</h3>
+
+
+<FluentGrid>
+    <FluentGridItem xs="12" sm="6">
+        <EditForm Model="User" FormName="change-user" OnValidSubmit="OnValidSubmitAsync" method="post" novalidate>
+            <DataAnnotationsValidator />
+            <FluentValidationSummary class="text-danger" role="alert" />
+            <FluentTextField Name="User.UserName" @bind-Value="User.FullName" Required="true" Placeholder="ادخل اسم المستخدم" Label="اسم المستخدم" Style="width: 100%" />
+            <FluentValidationMessage For="() => User.FullName" class="text-danger" />
+            <FluentTextField Name="User.UserEmail" @bind-Value="User.UserEmail" Required="true" Placeholder="ادخل البريد الالكتروني" Label="البريد الالكتروني" Style="width: 100%" />
+            <FluentValidationMessage For="() => User.UserEmail" class="text-danger" />
+            <FluentTextField Name="User.UserLogin" @bind-Value="User.UserName" Required="true" Placeholder="ادخل اسم الدخول" Label="اسم الدخول" Style="width: 100%" />
+            <FluentValidationMessage For="() => User.UserName" class="text-danger" />
+            <FluentAutocomplete Items="@roles" TOption="RoleDto" OnOptionsSearch="@OnRoleSearchAsync" OptionText="p=>p.RoleName" OptionValue="p=>p.RoleId" Height="300px" @bind-SelectedOptions="@User.Roles" AutoComplete="off" Label="الصلاحيات" Width="100%" Placeholder="" />
+            <div style="padding:10px"></div>
+            <div style="display:flex">
+                <FluentSpacer />
+                <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Save())" Style="width: 25%;">حفظ</FluentButton>
+                <FluentSpacer />
+                <FluentButton Type="ButtonType.Button" @onclick="ExitOnClick" Appearance="Appearance.Accent" IconStart="@(new MyIcons.Regular.Size16.Cancel())" Style="width: 25%;">رجوع</FluentButton>
+                <FluentSpacer />
+            </div>
+        </EditForm>
+    </FluentGridItem>
+</FluentGrid>
+
+
+@code {
+    [Parameter]
+    public UserWithRolesDto User { get; set; }
+
+
+    [Parameter]
+    public string Status { get; set; }
+
+    [Parameter]
+    public EventCallback OnDone { get; set; }
+
+    private List<RoleDto> roles;
+
+
+    protected override void OnInitialized()
+    {
+        loadRoles();
+        if (Status == "Add")
+        {
+            User = new UserWithRolesDto();
+        }
+    }
+
+    private void OnRoleSearchAsync(OptionsSearchEventArgs<RoleDto> e)
+    {
+        e.Items = roles.Where(i => i.RoleName.Contains(e.Text, StringComparison.OrdinalIgnoreCase))
+                              .OrderBy(i => i.RoleName);
+    }
+
+    private void loadRoles()
+    {
+        roles = (from r in AppIdentityDbContext.Roles select new RoleDto() { RoleId = r.Id, RoleName = r.Name }).ToList<RoleDto>();
+    }
+
+    async Task ExitOnClick()
+    {
+        //AppDbContext.Entry(AcademicProgram).Reload();
+        ToastService.ShowInfo("لم يتم تعديل اي بيانات", 3000);
+        AppIdentityDbContext.ChangeTracker.Clear();
+        await OnDone.InvokeAsync();
+    }
+
+    private async Task OnValidSubmitAsync()
+    {
+
+        if (Status == "Add")
+        {
+            await AddNew();
+        }
+        if (Status == "Edit")
+        {
+            Update();
+        }
+
+
+    }
+
+    private async Task AddNew()
+    {
+        var user = new ApplicationUser
+            {
+                UserName = User.UserName,
+                FullName = User.FullName,
+                Email = User.UserEmail,
+                EmailConfirmed = true // ← Mark email as confirmed
+            };
+
+        var result = await UserManager.CreateAsync(user, "A@b#123456");
+        await UserManager.AddToRolesAsync(user, User.Roles.Select(r => r.RoleName).ToArray());
+
+        ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
+        await OnDone.InvokeAsync();
+    }
+
+    private async Task Update()
+    {
+        var appUser = await UserManager.FindByIdAsync(User.UserId);
+        if (appUser != null)
+        {
+            appUser.UserName = User.UserName;
+            appUser.Email = User.UserEmail;
+            appUser.FullName = User.FullName;
+
+            var currentRoles = await UserManager.GetRolesAsync(appUser);
+
+            var removeResult = await UserManager.RemoveFromRolesAsync(appUser, currentRoles);
+
+            var addResult = await UserManager.AddToRolesAsync(appUser, User.Roles.Select(r => r.RoleName).ToArray());
+
+            ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
+        }
+        else
+        {
+            ToastService.ShowError("حدث خطأ اثناء تحديث البيانات", 9000);
+            
+        }
+        
+        await OnDone.InvokeAsync();
+    }
+}
