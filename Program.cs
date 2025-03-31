@@ -26,6 +26,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.DefaultRequestCulture = new RequestCulture("ar");
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
+    options.RequestCultureProviders.Clear(); //  important: clears auto-detection
 });
 //CultureInfo.CurrentUICulture = new CultureInfo("ar");
 

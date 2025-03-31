@@ -9,4 +9,9 @@ dotnet ef database update --context AppIdentityDbContext
 
 
 docker build -t academic-year-calendar:v1 .
-docker run -p 7000:8000 academic-year-calendar:v1
+docker run -d -p 7000:8080 academic-year-calendar:v1
+
+
+SQL Server (192.168.100.40) (SWE2025\\SQLEXPRESS)
+user : sa
+pass : P@ssw0rd
