@@ -46,7 +46,7 @@
     <Content Remove="Components\Settings\StudySubjects.razor" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DevExpress.Blazor" Version="24.2.3" />
+    <PackageReference Include="DevExpress.Blazor" Version="24.2.3" />    
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.*-*" />
   </ItemGroup>
   <ItemGroup>

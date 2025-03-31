@@ -9,14 +9,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link rel="stylesheet" href="app.css" />
-
-    <link rel="stylesheet" href="AcademicYearCalendar.styles.css" />
+    
+    @* <link rel="stylesheet" href="app.css" asp-append-version="true" />
+    <link rel="stylesheet" href="AcademicYearCalendar.styles.css" asp-append-version="true" /> *@
+    
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     
+    <link href=@AppendVersion("app.css") rel="stylesheet" />
+    <link href=@AppendVersion("AcademicYearCalendar.styles.css") rel="stylesheet" />
     <link href=@AppendVersion("_content/DevExpress.Blazor.Themes/blazing-berry.bs5.min.css") rel="stylesheet" />
     @DxResourceManager.RegisterScripts()    
-
+    
     <HeadOutlet  />
 </head>
 <body dir="rtl">
