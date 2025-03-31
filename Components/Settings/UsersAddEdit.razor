@@ -126,6 +126,8 @@
 
             var addResult = await UserManager.AddToRolesAsync(appUser, User.Roles.Select(r => r.RoleName).ToArray());
 
+            await UserManager.UpdateAsync(appUser);
+
             ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
         }
         else

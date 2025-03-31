@@ -23,10 +23,13 @@
     <Content Remove="Components\Account\Pages\InvalidUser.razor" />
     <Content Remove="Components\Account\Pages\LoginWith2fa.razor" />
     <Content Remove="Components\Account\Pages\LoginWithRecoveryCode.razor" />
+    <Content Remove="Components\Account\Pages\Manage\DeletePersonalData.razor" />
     <Content Remove="Components\Account\Pages\Manage\Disable2fa.razor" />
+    <Content Remove="Components\Account\Pages\Manage\Email.razor" />
     <Content Remove="Components\Account\Pages\Manage\EnableAuthenticator.razor" />
     <Content Remove="Components\Account\Pages\Manage\ExternalLogins.razor" />
     <Content Remove="Components\Account\Pages\Manage\GenerateRecoveryCodes.razor" />
+    <Content Remove="Components\Account\Pages\Manage\PersonalData.razor" />
     <Content Remove="Components\Account\Pages\Manage\ResetAuthenticator.razor" />
     <Content Remove="Components\Account\Pages\Manage\SetPassword.razor" />
     <Content Remove="Components\Account\Pages\Manage\TwoFactorAuthentication.razor" />

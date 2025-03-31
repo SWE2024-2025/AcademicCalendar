@@ -5,22 +5,28 @@
 @using AcademicYearCalendar.Data
 
 @inject UserManager<ApplicationUser> UserManager
-@inject SignInManager<ApplicationUser> SignInManager
-@inject IdentityUserAccessor UserAccessor
-@inject IdentityRedirectManager RedirectManager
+@rendermode InteractiveServer
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IToastService ToastService
+
+@* @rendermode @(new InteractiveServerRenderMode(prerender: false)) *@
 
 <PageTitle>الملف الشخصي</PageTitle>
 
 <h3>الملف الشخصي</h3>
-<StatusMessage />
 
 <FluentGrid>
     <FluentGridItem xs="12" sm="6">
-        <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
+        <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post" novalidate>
             <DataAnnotationsValidator />
             <FluentValidationSummary class="text-danger" role="alert" />
-            <FluentTextField Value="@username" Placeholder="Please choose your username." Disabled Label="اسم المستخدم" Appearance=FluentInputAppearance.Filled Style="width: 100%" />
-            <FluentTextField Name="Input.PhoneNumber" @bind-Value="Input.PhoneNumber" Placeholder="ادخل رقم التليفون" Label="رقم التليفون" Style="width: 100%" />
+            <FluentTextField Name="Input.FullName" @bind-Value="Input.FullName" Label="اسم المستخدم" Style="width: 100%" />
+            <FluentValidationMessage For="() => Input.FullName" class="text-danger" />
+            <FluentTextField Name="Input.UserName" @bind-Value="Input.UserName" Label="اسم الدخول" Style="width: 100%" />
+            <FluentValidationMessage For="() => Input.UserName" class="text-danger" />
+            <FluentTextField Name="Input.Email" @bind-Value="Input.Email" Label="البريد الالكتروني" Style="width: 100%" />
+            <FluentValidationMessage For="() => Input.Email" class="text-danger" />
+            <FluentTextField Name="Input.PhoneNumber" @bind-Value="Input.PhoneNumber" Label="رقم التليفون" Style="width: 100%" />
             <FluentValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
             <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" Style="width: 100%;">حفظ</FluentButton>
         </EditForm>
@@ -29,8 +35,6 @@
 
 @code {
     private ApplicationUser user = default!;
-    private string? username;
-    private string? phoneNumber;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -40,32 +44,64 @@
 
     protected override async Task OnInitializedAsync()
     {
-        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-        username = await UserManager.GetUserNameAsync(user);
-        phoneNumber = await UserManager.GetPhoneNumberAsync(user);
 
-        Input.PhoneNumber ??= phoneNumber;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            var authState = AuthenticationStateProvider.GetAuthenticationStateAsync().Result;
+            var user = authState.User;
+            var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var appUser = UserManager.FindByIdAsync(userId).Result;
+            if (appUser != null)
+            {
+                Input.Id = appUser.Id;
+                Input.FullName = appUser.FullName;
+                Input.UserName = appUser.UserName;
+                Input.Email = appUser.Email;
+                Input.PhoneNumber = appUser.PhoneNumber;
+            }
+            StateHasChanged();
+        }
     }
 
     private async Task OnValidSubmitAsync()
     {
-        if (Input.PhoneNumber != phoneNumber)
+        var appUser = await UserManager.FindByIdAsync(Input.Id);
+        if (appUser != null)
         {
-            var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-            if (!setPhoneResult.Succeeded)
-            {
-                RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
-            }
+            appUser.FullName = Input.FullName ;
+            appUser.UserName = Input.UserName ;
+            appUser.Email = Input.Email ;
+            appUser.PhoneNumber = Input.PhoneNumber  ;
+            await UserManager.UpdateAsync(appUser);
+            ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
         }
-
-        await SignInManager.RefreshSignInAsync(user);
-        RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext);
     }
 
     private sealed class InputModel
     {
+        
+        public string Id { get; set; }
+        
+        [Display(Name = "اسم المستخدم")]
+        [Required(ErrorMessage = "يجب ادخل اسم المستخدم")]
+        public string FullName { get; set; }
+
+        [EmailAddress(ErrorMessage = "يجب ادخل البريد الالكتروني"))]
+        [Required(ErrorMessage = "يجب ادخل البريد الالكتروني")]
+        [Display(Name = "البريد الالكتروني")]
+        public string Email { get; set; }
+
+        [Display(Name = "اسم الدخول")]
+        [Required(ErrorMessage = "يجب ادخل اسم الدخول")]
+        public string UserName { get; set; }
+        
         [Phone]
-        [Display(Name = "Phone number")]
+        [Display(Name = "رقم التليفون")]
         public string? PhoneNumber { get; set; }
     }
 }
