@@ -69,13 +69,21 @@
         <FluentAutocomplete Items="@resources" TOption="Resource" OnOptionsSearch="@OnSearch" OptionText="p=>p.Name" OptionValue="p=>p.Id.ToString()" Height="300px" @bind-SelectedOptions="@appointmentInfo.Resources" AutoComplete="off" Label="موارد الموعد" Width="100%" Placeholder="" />
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"></FluentGridItem>
-    <FluentGridItem xs="12" sm="6">
-        <input type="color"  id="head" name="head" @bind-value="@bgColor" />
-        <label for="head">Head</label>
+    <FluentGridItem xs="12" sm="3">
+        <div style="display: flex;justify-content: space-between;">
+            <div style="display: grid;padding:5px">
+                <label for="TextColor" class="fluent-input-label" style="margin-bottom: 4px;">
+                    لون النص
+                </label>
+                <input type="color" id="TextColor" name="TextColor" @bind-value="@appointmentInfo.TextColor" />
+            </div>
+            <div style="display: grid;padding:5px">
+                <label for="BackgroundColor" style="margin-bottom: 4px;">لون الخلفية</label>
+                <input type="color" id="BackgroundColor" name="BackgroundColor" @bind-value="@appointmentInfo.BackgroundColor" />
+            </div>
+        </div>
     </FluentGridItem>
-    <FluentGridItem xs="12" sm="6">
-
-    </FluentGridItem>
+    <FluentGridItem xs="12" sm="9"></FluentGridItem>
     <FluentGridItem xs="12" sm="6">
         <div style="display:flex">
             <FluentSpacer />
@@ -197,6 +205,9 @@
     {
         public string Caption { get; set; }
 
+        public string? TextColor { get; set; } = "#ffffff";
+        public string? BackgroundColor { get; set; } = "#fd7e14";
+
         public DateTime? StartDate { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndtDate { get; set; }
@@ -219,6 +230,8 @@
             DxSchedulerRecurrenceInfo recurrenceInfo;
 
             appointment.Caption = this.Caption;
+            appointment.TextColor = this.TextColor;
+            appointment.BackgroundColor = this.BackgroundColor;
 
             appointment.StartDate = new DateTime(this.StartDate.GetValueOrDefault().Year, this.StartDate.GetValueOrDefault().Month, this.StartDate.GetValueOrDefault().Day, this.StartTime.GetValueOrDefault().Hour, this.StartTime.GetValueOrDefault().Minute,0);
             appointment.EndDate = new DateTime(this.StartDate.GetValueOrDefault().Year, this.StartDate.GetValueOrDefault().Month, this.StartDate.GetValueOrDefault().Day, this.EndTime.GetValueOrDefault().Hour, this.EndTime.GetValueOrDefault().Minute, 0);
@@ -274,6 +287,10 @@
         public void SetAppointmentInfo(Appointment _appointment, List<Resource> resources)
         {
             this.Caption = _appointment.Caption;
+            
+            this.TextColor = _appointment.TextColor;
+            this.BackgroundColor = _appointment.BackgroundColor;
+            
             this.StartDate = _appointment.StartDate;
             this.StartTime = _appointment.StartDate;
             this.EndTime = _appointment.EndDate;
