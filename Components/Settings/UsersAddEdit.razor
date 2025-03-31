@@ -105,10 +105,16 @@
             };
 
         var result = await UserManager.CreateAsync(user, "A@b#123456");
-        await UserManager.AddToRolesAsync(user, User.Roles.Select(r => r.RoleName).ToArray());
-
-        ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
-        await OnDone.InvokeAsync();
+        if (result.Succeeded)
+        {
+            await UserManager.AddToRolesAsync(user, User.Roles.Select(r => r.RoleName).ToArray());
+            ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
+            await OnDone.InvokeAsync();
+        }
+        else
+        {
+            ToastService.ShowError("حدث خطأ اثناء تحديث البيانات" + string.Join(",", result.Errors.Select(e => e.Description)), 9000);
+        }
     }
 
     private async Task Update()
@@ -120,22 +126,24 @@
             appUser.Email = User.UserEmail;
             appUser.FullName = User.FullName;
 
-            var currentRoles = await UserManager.GetRolesAsync(appUser);
+            var updateResult = await UserManager.UpdateAsync(appUser);
+            if (updateResult.Succeeded)
+            {
+                var currentRoles = await UserManager.GetRolesAsync(appUser);
+                var removeResult = await UserManager.RemoveFromRolesAsync(appUser, currentRoles);
+                var addResult = await UserManager.AddToRolesAsync(appUser, User.Roles.Select(r => r.RoleName).ToArray());
 
-            var removeResult = await UserManager.RemoveFromRolesAsync(appUser, currentRoles);
-
-            var addResult = await UserManager.AddToRolesAsync(appUser, User.Roles.Select(r => r.RoleName).ToArray());
-
-            await UserManager.UpdateAsync(appUser);
-
-            ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
+                ToastService.ShowSuccess("تم حفظ البيانات بنجاح", 3000);
+                await OnDone.InvokeAsync();
+            }
+            else
+            {
+                ToastService.ShowError("حدث خطأ اثناء تحديث البيانات" + string.Join(",", updateResult.Errors.Select(e => e.Description)), 9000);
+            }
         }
         else
         {
             ToastService.ShowError("حدث خطأ اثناء تحديث البيانات", 9000);
-            
         }
-        
-        await OnDone.InvokeAsync();
     }
 }

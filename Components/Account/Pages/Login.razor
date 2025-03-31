@@ -21,8 +21,8 @@
             <hr />
             <FluentValidationSummary class="text-danger" role="alert" />
             <FluentStack Orientation="Orientation.Vertical">
-                <FluentTextField Name="Input.Email" @bind-Value="Input.Email" AutoComplete="username" Required="true" Placeholder="name@example.com" Label="البريد الالكتروني" Style="width: 100%" />
-                <FluentValidationMessage For="() => Input.Email" class="text-danger" />
+                <FluentTextField Name="Input.UserName" @bind-Value="Input.UserName" AutoComplete="username" Required="true" Placeholder="name@example.com" Label="البريد الالكتروني" Style="width: 100%" />
+                <FluentValidationMessage For="() => Input.UserName" class="text-danger" />
                 <FluentTextField type="password" Name="Input.Password" @bind-Value="Input.Password" AutoComplete="current-password" Required="true" Placeholder="password" Label="كلمة المرور" Style="width: 100%" />
                 <FluentValidationMessage For="() => Input.Password" class="text-danger" />
                 <FluentCheckbox Name="Input.RememberMe" @bind-Value="Input.RememberMe" Label="تذكرني" />
@@ -56,7 +56,7 @@
 
     public async Task LoginUser()
     {
-        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        var result = await SignInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
@@ -76,7 +76,7 @@
     private sealed class InputModel
     {
         [Required]
-        public string Email { get; set; } = "";
+        public string UserName { get; set; } = "";
 
         [Required]
         [DataType(DataType.Password)]
