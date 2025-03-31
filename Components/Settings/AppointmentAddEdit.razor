@@ -70,6 +70,13 @@
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"></FluentGridItem>
     <FluentGridItem xs="12" sm="6">
+        <input type="color"  id="head" name="head" @bind-value="@bgColor" />
+        <label for="head">Head</label>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
         <div style="display:flex">
             <FluentSpacer />
             <FluentButton Type="ButtonType.Button" @onclick="OnSaveClick" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Save())" Style="width: 25%;">حفظ</FluentButton>
@@ -82,6 +89,7 @@
 
 
 @code {
+    public string bgColor { get; set; } = "#e66465";
     [Parameter]
     public Appointment Appointment { get; set; }
 
@@ -233,6 +241,7 @@
                     if (int.Parse(this.RepeatPeriod) == 1)
                     {
                         recurrenceInfo.Type = SchedulerRecurrenceType.Daily;
+                        recurrenceInfo.Frequency = this.RepeatedEvery;
                     }
                     if (int.Parse(this.RepeatPeriod) == 2)
                     {
@@ -249,6 +258,10 @@
                 }
                 appointment.Recurrence = recurrenceInfo.ToXml();
             }
+            else
+            {
+                appointment.Recurrence = null;
+            }
             if (this.Resources != null && this.Resources.Count() > 0)
             {
                 var resources = this.Resources.Select(r => r.Id).ToArray();
@@ -264,8 +277,11 @@
             this.StartDate = _appointment.StartDate;
             this.StartTime = _appointment.StartDate;
             this.EndTime = _appointment.EndDate;
-            var res = DxSchedulerResourceIdCollection.FromXml(_appointment.Resources).Select(r=> (int)r).ToArray();
-            this.Resources = resources.Where(r => res.Contains(r.Id));
+            if (!string.IsNullOrEmpty(_appointment.Resources))
+            {
+                var res = DxSchedulerResourceIdCollection.FromXml(_appointment.Resources).Select(r => (int)r).ToArray();
+                this.Resources = resources.Where(r => res.Contains(r.Id));
+            }
             if (_appointment.Recurrence != null)
             {
                 DxSchedulerRecurrenceInfo recurrenceInfo = new DxSchedulerRecurrenceInfo();
@@ -273,7 +289,9 @@
                 if (recurrenceInfo.Type == SchedulerRecurrenceType.Daily)
                 {
                     this.RepeatPeriod = "1";
+                    this.RepeatedEvery = recurrenceInfo.Frequency;
                 }
+
                 if (recurrenceInfo.Type == SchedulerRecurrenceType.Weekly)
                 {
                     this.RepeatPeriod = "2";

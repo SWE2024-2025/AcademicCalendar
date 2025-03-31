@@ -2,6 +2,7 @@
 @using Microsoft.EntityFrameworkCore
 @using AcademicYearCalendar.Data
 @inject AppDbContext AppDbContext
+@using DevExpress.Blazor
 @rendermode InteractiveServer
 
 <h3>إدارة التقويم</h3>
@@ -18,7 +19,17 @@
     <FluentButton Appearance="Appearance.Accent" @onclick="AddOnClick" IconStart="@(new Icons.Regular.Size16.Add())">اضافة موعد</FluentButton>
     <FluentDataGrid Items="@appointments" MultiLine="true" Pagination="@pagination">
         <PropertyColumn Property="@(p => p.Caption)" Title="وصف الموعد" />
-        <PropertyColumn Property="@(p => $"{p.StartDate}-{p.EndDate}")" Title="تاريخ الموعد" />
+        <PropertyColumn Property="@(p => $"{p.StartDate.ToString("yyyy-MM-dd")} {p.StartDate.TimeOfDay} {p.EndDate.TimeOfDay}")" Title="تاريخ الموعد" />
+        <TemplateColumn Title="تكرار الموعد">
+            @if (!string.IsNullOrEmpty(context.Recurrence)) 
+            {
+                <span>كل يوم:</span>
+                <span> @context.RepeatDay </span>
+                <span>حتي تاريخ:</span>
+                <span> @context.RepeatEndDate </span>
+
+            }
+        </TemplateColumn>
         <TemplateColumn Title="">
             <FluentButton Appearance="Appearance.Accent" @onclick="()=> EditOnClick(context)" IconStart="@(new Icons.Regular.Size16.Edit())">تعديل البيانات</FluentButton>
         </TemplateColumn>
