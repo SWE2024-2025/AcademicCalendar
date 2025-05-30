@@ -29,4 +29,4 @@ jobs:
       shell: pwsh
       run: |
         $latestTag = docker images academic-calendar --format "{{.Tag}}" | Sort-Object -Descending | Select-Object -First 1
-        docker run -d --name academic-calendar -p 7000:7000 academic-calendar:$latestTag
+        docker run -d --name academic-calendar -p 7000:8080 academic-calendar:$latestTag
