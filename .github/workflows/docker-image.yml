@@ -20,16 +20,10 @@ jobs:
     - name: Stop and remove existing container
       shell: pwsh
       run: |
+        # Removes old containers named 'academic-calendar'
         if (docker ps -a --format "{{.Names}}" | Select-String -Pattern "^academic-calendar$") {
           docker stop academic-calendar
           docker rm academic-calendar
-        }
-    - name: Remove old academic-calendar images
-      shell: pwsh
-      run: |
-        $images = docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | Select-String -Pattern "^academic-calendar:" | ForEach-Object { $_.ToString().Split(" ")[1] }
-        foreach ($id in $images) {
-          docker rmi -f $id
         }
     - name: Run latest image on port 7000
       shell: pwsh
