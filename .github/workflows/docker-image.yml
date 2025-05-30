@@ -14,6 +14,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Publish .NET project
+      shell: pwsh
+      run: dotnet publish -c Release
     - name: Build the Docker image
       shell: pwsh
       run: docker build . --tag academic-calendar:$([DateTimeOffset]::Now.ToUnixTimeSeconds())
