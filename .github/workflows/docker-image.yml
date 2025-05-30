@@ -17,3 +17,22 @@ jobs:
     - name: Build the Docker image
       shell: pwsh
       run: docker build . --file Dockerfile --tag academic-calendar:$([DateTimeOffset]::Now.ToUnixTimeSeconds())
+    - name: Stop and remove existing container
+      shell: pwsh
+      run: |
+        if (docker ps -a --format "{{.Names}}" | Select-String -Pattern "^academic-calendar$") {
+          docker stop academic-calendar
+          docker rm academic-calendar
+        }
+    - name: Remove old academic-calendar images
+      shell: pwsh
+      run: |
+        $images = docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | Select-String -Pattern "^academic-calendar:" | ForEach-Object { $_.ToString().Split(" ")[1] }
+        foreach ($id in $images) {
+          docker rmi -f $id
+        }
+    - name: Run latest image on port 7000
+      shell: pwsh
+      run: |
+        $latestTag = docker images academic-calendar --format "{{.Tag}}" | Sort-Object -Descending | Select-Object -First 1
+        docker run -d --name academic-calendar -p 7000:7000 academic-calendar:$latestTag
