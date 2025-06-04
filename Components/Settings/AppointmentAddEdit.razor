@@ -69,7 +69,7 @@
         <FluentAutocomplete Items="@resources" TOption="Resource" OnOptionsSearch="@OnSearch" OptionText="p=>p.Name" OptionValue="p=>p.Id.ToString()" Height="300px" @bind-SelectedOptions="@appointmentInfo.Resources" AutoComplete="off" Label="موارد الموعد" Width="100%" Placeholder="" />
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6"></FluentGridItem>
-    <FluentGridItem xs="12" sm="3">
+    <FluentGridItem xs="12" sm="3" Style="display:none" >
         <div style="display: flex;justify-content: space-between;">
             <div style="display: grid;padding:5px">
                 <label for="TextColor" class="fluent-input-label" style="margin-bottom: 4px;">
